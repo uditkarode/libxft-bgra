@@ -50,6 +50,7 @@
 #  define HAVE_FT_BITMAP_SIZE_Y_PPEM 1
 # else
 #  define HAVE_FT_BITMAP_SIZE_Y_PPEM 0
+# endif
 #endif
 
 typedef struct _XftMatcher {
