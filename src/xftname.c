@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftname.c,v 1.12 2002/05/24 07:02:38 keithp Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -33,13 +32,14 @@ static const FcObjectType	_XftObjectTypes[] = {
 
 #define NUM_OBJECT_TYPES    (sizeof _XftObjectTypes / sizeof _XftObjectTypes[0])
 
-Bool	_XftNameInitialized;
+FcBool	_XftNameInitialized;
 
 void 
 _XftNameInit (void)
 {
     if (_XftNameInitialized)
 	return;
+    _XftNameInitialized = FcTrue;
     FcNameRegisterObjectTypes (_XftObjectTypes, NUM_OBJECT_TYPES);
 }
 
@@ -55,13 +55,27 @@ XftNameUnparse (FcPattern *pat, char *dest, int len)
 {
     FcChar8 *name;
 
+    _XftNameInit ();
     name = FcNameUnparse (pat);
     if (!name)
 	return FcFalse;
     if (strlen ((char *) name) + 1 > len)
     {
+	FcPattern *new = FcPatternDuplicate (pat);
 	free (name);
-	return FcFalse;
+	FcPatternDel (new, FC_LANG);
+	FcPatternDel (new, FC_CHARSET);
+	name = FcNameUnparse (new);
+	FcPatternDestroy (new);
+	if (!name)
+	    return FcFalse;
+	if (strlen ((char *) name) + 1 > len)
+	{
+	    strncpy (dest, ((char *) name), (size_t) len - 1);
+	    dest[len - 1] = '\0';
+	    free (name);
+	    return FcFalse;
+	}
     }
     strcpy (dest, ((char *) name));
     free (name);

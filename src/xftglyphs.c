@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftglyphs.c,v 1.24 2003/11/20 22:36:33 dawes Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -26,8 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xftint.h"
-#include <ft2build.h>
-#include FT_OUTLINE_H
+#include <freetype/ftoutln.h>
 #include <fontconfig/fcfreetype.h>
 
 static const int    filters[3][3] = {
@@ -535,9 +533,14 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    }
 	    else
 	    {
-		xftg->bitmap = malloc (sizergba);
-		if (xftg->bitmap)
-		    memcpy (xftg->bitmap, bufBitmapRgba, sizergba);
+		if (sizergba)
+		{
+		    xftg->bitmap = malloc (sizergba);
+		    if (xftg->bitmap)
+			memcpy (xftg->bitmap, bufBitmapRgba, sizergba);
+		}
+		else
+		    xftg->bitmap = 0;
 	    }
 	}
 	else
@@ -576,9 +579,14 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    }
 	    else
 	    {
-		xftg->bitmap = malloc (size);
-		if (xftg->bitmap)
-		    memcpy (xftg->bitmap, bufBitmap, size);
+		if (size)
+		{
+		    xftg->bitmap = malloc (size);
+		    if (xftg->bitmap)
+			memcpy (xftg->bitmap, bufBitmap, size);
+		}
+		else
+		    xftg->bitmap = 0;
 	    }
 	}
 	font->glyph_memory += xftg->glyph_memory;
@@ -735,7 +743,7 @@ XftCharIndex (Display	    *dpy,
 		offset = 1;
 	}
 	ent = ent + offset;
-	if (ent > font->hash_value)
+	if (ent >= font->hash_value)
 	    ent -= font->hash_value;
     }
     return font->hash_table[ent].glyph;

@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftswap.c,v 1.1 2002/02/15 07:37:35 keithp Exp $
  *
- * Copyright © 2002 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2002 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that

@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftlist.c,v 1.4 2003/08/06 14:03:59 eich Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that

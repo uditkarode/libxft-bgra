@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftrender.c,v 1.15 2002/12/14 01:59:38 dawes Exp $
  *
- * Copyright � 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -386,6 +385,31 @@ XftCharSpecRender (Display		*dpy,
 	free (glyphs);
 }
 
+/*
+ * Choose which format to draw text in when drawing with fonts
+ * of different formats.  The trick is that ARGB formats aren't
+ * compatible with A formats as PictOpAdd does the wrong thing, so
+ * fall back to an A format when presented with an ARGB and A format
+ */
+
+#define XftIsARGBFormat(a)  ((a)->depth == 32)
+
+static XRenderPictFormat *
+XftPreferFormat (Display *dpy, XRenderPictFormat *a, XRenderPictFormat *b)
+{
+    XRenderPictFormat	*prefer = 0;
+    
+    if (a == b)
+	prefer = a;
+    else if (XftIsARGBFormat(a) != XftIsARGBFormat(b))
+	prefer = XRenderFindStandardFormat (dpy, PictStandardA8);
+    else if (a->depth > b->depth)
+	prefer = a;
+    else
+	prefer = b;
+    return prefer;
+}
+
 void
 XftGlyphFontSpecRender (Display			    *dpy,
 			int			    op,
@@ -399,6 +423,7 @@ XftGlyphFontSpecRender (Display			    *dpy,
     int		    i, j;
     XftFont	    *prevPublic;
     XftFontInt	    *firstFont;
+    XRenderPictFormat	*format;
     FT_UInt	    missing[XFT_NMISSING];
     int		    nmissing;
     int		    n;
@@ -496,6 +521,7 @@ XftGlyphFontSpecRender (Display			    *dpy,
     if (i == nglyphs)
 	goto bail2;
     glyph = firstFont->glyphs[g];
+    format = firstFont->format;
     x = glyphs[i].x + glyph->metrics.xOff;
     y = glyphs[i].y + glyph->metrics.yOff;
     prevPublic = 0;
@@ -516,6 +542,8 @@ XftGlyphFontSpecRender (Display			    *dpy,
 	    if (pub != prevPublic || x != glyphs[i].x || y != glyphs[i].y)
 	    {
 		prevPublic = pub;
+		if (font->format != format)
+		    format = XftPreferFormat (dpy, font->format, format);
 		x = glyphs[i].x;
 		y = glyphs[i].y;
 		++nelt;
@@ -586,17 +614,17 @@ XftGlyphFontSpecRender (Display			    *dpy,
     }
     switch (width) {
     case 1:
-	XRenderCompositeText8 (dpy, op, src, dst, firstFont->format,
+	XRenderCompositeText8 (dpy, op, src, dst, format,
 			       srcx, srcy, glyphs[0].x, glyphs[0].y,
 			       elts, nelt);
 	break;
     case 2:
-	XRenderCompositeText16 (dpy, op, src, dst, firstFont->format,
+	XRenderCompositeText16 (dpy, op, src, dst, format,
 				srcx, srcy, glyphs[0].x, glyphs[0].y,
 				(XGlyphElt16 *) elts, nelt);
 	break;
     case 4:
-	XRenderCompositeText32 (dpy, op, src, dst, firstFont->format,
+	XRenderCompositeText32 (dpy, op, src, dst, format,
 				srcx, srcy, glyphs[0].x, glyphs[0].y,
 				(XGlyphElt32 *) elts, nelt);
 	break;

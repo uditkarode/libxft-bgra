@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/Xft.h,v 1.33 2003/11/20 22:36:33 dawes Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -25,9 +24,15 @@
 #ifndef _XFT_H_
 #define _XFT_H_
 
+/*
+  * Current Xft version number.  This same number
+  * must appear in the Xft configure.ac file. Yes,
+  * it'a a pain to synchronize version numbers like this.
+  */
+
 #define XFT_MAJOR	2
 #define XFT_MINOR	1
-#define XFT_REVISION	0
+#define XFT_REVISION	6
 #define XFT_VERSION	((XFT_MAJOR * 10000) + (XFT_MINOR * 100) + (XFT_REVISION))
 #define XftVersion	XFT_VERSION
 

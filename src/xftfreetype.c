@@ -1,7 +1,7 @@
 /*
- * $XFree86: xc/lib/Xft/xftfreetype.c,v 1.30 2003/03/26 20:43:51 tsi Exp $
+ * $XFree86: xc/lib/Xft/xftfreetype.c,v 1.29tsi Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -81,6 +81,7 @@ _XftGetFile (const FcChar8 *file, int id)
     f->face = 0;
     f->xsize = 0;
     f->ysize = 0;
+    f->matrix.xx = f->matrix.xy = f->matrix.yx = f->matrix.yy = 0;
     return f;
 }
 
@@ -103,6 +104,7 @@ _XftGetFaceFile (FT_Face face)
     f->face = face;
     f->xsize = 0;
     f->ysize = 0;
+    f->matrix.xx = f->matrix.xy = f->matrix.yx = f->matrix.yy = 0;
     return f;
 }
 
@@ -180,6 +182,14 @@ _XftUnlockFile (XftFtFile *f)
 	_XftLockError ("too many file unlocks");
 }
 
+#if HAVE_FT_BITMAP_SIZE_Y_PPEM
+#define X_SIZE(face,i) ((face)->available_sizes[i].x_ppem)
+#define Y_SIZE(face,i) ((face)->available_sizes[i].y_ppem)
+#else
+#define X_SIZE(face,i) ((face)->available_sizes[i].width << 6)
+#define Y_SIZE(face,i) ((face)->available_sizes[i].height << 6)
+#endif
+
 FcBool
 _XftSetFace (XftFtFile *f, FT_F26Dot6 xsize, FT_F26Dot6 ysize, FT_Matrix *matrix)
 {
@@ -190,8 +200,56 @@ _XftSetFace (XftFtFile *f, FT_F26Dot6 xsize, FT_F26Dot6 ysize, FT_Matrix *matrix
 	if (XftDebug() & XFT_DBG_GLYPH)
 	    printf ("Set face size to %dx%d (%dx%d)\n", 
 		    (int) (xsize >> 6), (int) (ysize >> 6), (int) xsize, (int) ysize);
-	if (FT_Set_Char_Size (face, xsize, ysize, 0, 0))
-	    return False;
+	/*
+	 * Bitmap only faces must match exactly, so find the closest
+	 * one (height dominant search)
+	 */
+	if (!(face->face_flags & FT_FACE_FLAG_SCALABLE))
+	{
+	    int		i, best = 0;
+
+#define xft_abs(a)	((a) < 0 ? -(a) : (a))
+#define dist(a,b)	(xft_abs((a)-(b)))
+
+	    for (i = 1; i < face->num_fixed_sizes; i++)
+	    {
+		if (dist (ysize, Y_SIZE(face,i)) <
+		    dist (ysize, Y_SIZE(face, best)) ||
+		    (dist (ysize, Y_SIZE(face, i)) ==
+		     dist (ysize, Y_SIZE(face, best)) &&
+		     dist (xsize, X_SIZE(face, i)) <
+		     dist (xsize, X_SIZE(face, best))))
+		{
+		    best = i;
+		}
+	    }
+	    /* 
+	     * Freetype 2.1.7 and earlier used width/height
+	     * for matching sizes in the BDF and PCF loaders.
+	     * This has been fixed for 2.1.8.  Because BDF and PCF
+	     * files have but a single strike per file, we can
+	     * simply try both sizes.
+	     */
+	    if (
+#if HAVE_FT_BITMAP_SIZE_Y_PPEM
+		FT_Set_Char_Size (face, face->available_sizes[best].x_ppem,
+				  face->available_sizes[best].y_ppem, 0, 0) != 0
+		&&
+#endif
+		FT_Set_Char_Size (face, face->available_sizes[best].width << 6,
+				  face->available_sizes[best].height << 6,
+				  0, 0) != 0)
+	    {
+		return False;
+	    }
+	}
+	else
+    	{
+	    if (FT_Set_Char_Size (face, xsize, ysize, 0, 0))
+	    {
+		return False;
+	    }
+	}
 	f->xsize = xsize;
 	f->ysize = ysize;
     }
@@ -326,6 +384,9 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
     double	    aspect;
     FcMatrix	    *font_matrix;
     FcBool	    hinting, vertical_layout, autohint, global_advance;
+#ifdef FC_HINT_STYLE
+    int             hint_style;
+#endif
     FcChar32	    hash, *hashp;
     FT_Face	    face;
     int		    nhash;
@@ -466,8 +527,65 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
 	goto bail1;
     }
 
-    if (!hinting)
+#ifdef FC_HINT_STYLE
+    switch (FcPatternGetInteger (pattern, FC_HINT_STYLE, 0, &hint_style)) {
+    case FcResultNoMatch:
+	hint_style = FC_HINT_FULL;
+	break;
+    case FcResultMatch:
+	break;
+    default:
+	goto bail1;
+    }
+#endif
+
+    if (!hinting
+#ifdef FC_HINT_STYLE
+	|| hint_style == FC_HINT_NONE
+#endif
+	)
+    {
 	fi->load_flags |= FT_LOAD_NO_HINTING;
+    }
+
+    /* Figure out the load target, which modifies the hinting
+     * behavior of FreeType based on the intended use of the glyphs.
+     */
+    if (fi->antialias)
+    {
+#ifdef FC_HINT_STYLE
+#ifdef FT_LOAD_TARGET_LIGHT
+	if (FC_HINT_NONE < hint_style && hint_style < FC_HINT_FULL)
+	{
+	    fi->load_flags |= FT_LOAD_TARGET_LIGHT;
+	}
+	else
+#endif
+#endif
+	{
+	    /* autohinter will snap stems to integer widths, when
+	     * the LCD targets are used.
+	     */
+	    switch (fi->rgba) {
+	    case FC_RGBA_RGB:
+	    case FC_RGBA_BGR:
+#ifdef FT_LOAD_TARGET_LCD
+		fi->load_flags |= FT_LOAD_TARGET_LCD;
+#endif
+		break;
+	    case FC_RGBA_VRGB:
+	    case FC_RGBA_VBGR:
+#ifdef FT_LOAD_TARGET_LCD_V
+		fi->load_flags |= FT_LOAD_TARGET_LCD_V;
+#endif
+		break;
+	    }
+	}
+    }
+#ifdef FT_LOAD_TARGET_MONO
+    else
+	fi->load_flags |= FT_LOAD_TARGET_MONO;
+#endif
     
     /* set vertical layout if requested */
     switch (FcPatternGetBool (pattern, FC_VERTICAL_LAYOUT, 0, &vertical_layout)) {
@@ -638,6 +756,7 @@ XftFontOpenInfo (Display	*dpy,
     int			alloc_size;
     int			ascent, descent, height;
     int			i;
+    int			num_glyphs;
 
     if (!info)
 	return 0;
@@ -680,7 +799,9 @@ XftFontOpenInfo (Display	*dpy,
      * off and compute it.  Yes, this is expensive, but it's
      * required to map Unicode to glyph indices.
      */
-    if (FcPatternGetCharSet (pattern, FC_CHARSET, 0, &charset) != FcResultMatch)
+    if (FcPatternGetCharSet (pattern, FC_CHARSET, 0, &charset) == FcResultMatch)
+	charset = FcCharSetCopy (charset);
+    else
 	charset = FcFreeTypeCharSet (face, FcConfigGetBlanks (0));
     
     antialias = fi->antialias;
@@ -699,59 +820,20 @@ XftFontOpenInfo (Display	*dpy,
 	    case FC_RGBA_BGR:
 	    case FC_RGBA_VRGB:
 	    case FC_RGBA_VBGR:
-		pf.depth = 32;
-		pf.type = PictTypeDirect;
-		pf.direct.alpha = 24;
-		pf.direct.alphaMask = 0xff;
-		pf.direct.red = 16;
-		pf.direct.redMask = 0xff;
-		pf.direct.green = 8;
-		pf.direct.greenMask = 0xff;
-		pf.direct.blue = 0;
-		pf.direct.blueMask = 0xff;
-		format = XRenderFindFormat(dpy, 
-					   PictFormatType|
-					   PictFormatDepth|
-					   PictFormatAlpha|
-					   PictFormatAlphaMask|
-					   PictFormatRed|
-					   PictFormatRedMask|
-					   PictFormatGreen|
-					   PictFormatGreenMask|
-					   PictFormatBlue|
-					   PictFormatBlueMask,
-					   &pf, 0);
+		format = XRenderFindStandardFormat (dpy, PictStandardARGB32);
 		break;
 	    default:
-		pf.depth = 8;
-		pf.type = PictTypeDirect;
-		pf.direct.alpha = 0;
-		pf.direct.alphaMask = 0xff;
-		format = XRenderFindFormat(dpy, 
-					   PictFormatType|
-					   PictFormatDepth|
-					   PictFormatAlpha|
-					   PictFormatAlphaMask,
-					   &pf, 0);
+		format = XRenderFindStandardFormat (dpy, PictStandardA8);
 		break;
 	    }
 	}
 	else
 	{
-	    pf.depth = 1;
-	    pf.type = PictTypeDirect;
-	    pf.direct.alpha = 0;
-	    pf.direct.alphaMask = 0x1;
-	    format = XRenderFindFormat(dpy, 
-				       PictFormatType|
-				       PictFormatDepth|
-				       PictFormatAlpha|
-				       PictFormatAlphaMask,
-				       &pf, 0);
+	    format = XRenderFindStandardFormat (dpy, PictStandardA1);
 	}
 	
 	if (!format)
-	    goto bail0;
+	    goto bail2;
     }
     else
 	format = 0;
@@ -769,13 +851,18 @@ XftFontOpenInfo (Display	*dpy,
 	rehash_value = 0;
     }
     
+    /*
+     * Sometimes the glyphs are numbered 1..n, other times 0..n-1,
+     * accept either numbering scheme by making room in the table
+     */
+    num_glyphs = face->num_glyphs + 1;
     alloc_size = (sizeof (XftFontInt) + 
-		  face->num_glyphs * sizeof (XftGlyph *) +
+		  num_glyphs * sizeof (XftGlyph *) +
 		  hash_value * sizeof (XftUcsHash));
     font = malloc (alloc_size);
     
     if (!font)
-	goto bail1;
+	goto bail2;
 
     XftMemAlloc (XFT_MEM_FONT, alloc_size);
 
@@ -867,8 +954,8 @@ XftFontOpenInfo (Display	*dpy,
      * Per glyph information
      */
     font->glyphs = (XftGlyph **) (font + 1);
-    memset (font->glyphs, '\0', face->num_glyphs * sizeof (XftGlyph *));
-    font->num_glyphs = face->num_glyphs;
+    memset (font->glyphs, '\0', num_glyphs * sizeof (XftGlyph *));
+    font->num_glyphs = num_glyphs;
     /*
      * Unicode hash table information
      */
@@ -897,6 +984,8 @@ XftFontOpenInfo (Display	*dpy,
 
     return &font->public;
     
+bail2:
+    FcCharSetDestroy (charset);
 bail1:
     _XftUnlockFile (fi->file);
 bail0:
@@ -929,9 +1018,13 @@ XftFontCopy (Display *dpy, XftFont *public)
 static void
 XftFontDestroy (Display *dpy, XftFont *public)
 {
-    XftFontInt	*font = (XftFontInt *) public;
-    int		i;
+    XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, False);
+    XftFontInt	    *font = (XftFontInt *) public;
+    int		    i;
     
+    /* note reduction in memory use */
+    if (info)
+	info->glyph_memory -= font->glyph_memory;
     /* Clean up the info */
     XftFontInfoEmpty (dpy, &font->info);
     /* Free the glyphset */
@@ -948,6 +1041,10 @@ XftFontDestroy (Display *dpy, XftFont *public)
 	    free (xftg);
 	}
     }
+    
+    /* Free the pattern and the charset */
+    FcPatternDestroy (font->public.pattern);
+    FcCharSetDestroy (font->public.charset);
     
     /* Finally, free the font structure */
     XftMemFree (XFT_MEM_FONT, sizeof (XftFontInt) +

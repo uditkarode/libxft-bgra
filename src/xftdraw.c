@@ -1,7 +1,7 @@
 /*
- * $XFree86: xc/lib/Xft/xftdraw.c,v 1.26 2003/04/03 22:25:50 dawes Exp $
+ * $XFree86: xc/lib/Xft/xftdraw.c,v 1.25 2002/10/11 17:53:02 keithp Exp $
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -177,6 +177,7 @@ XftDrawCreateBitmap (Display	*dpy,
     draw->colormap = 0;
     draw->render.pict = 0;
     draw->core.gc = 0;
+    draw->core.use_pixmap = 0;
     draw->clip_type = XftClipTypeNone;
     draw->subwindow_mode = ClipByChildren;
     XftMemAlloc (XFT_MEM_DRAW, sizeof (XftDraw));
@@ -202,6 +203,7 @@ XftDrawCreateAlpha (Display *dpy,
     draw->colormap = 0;
     draw->render.pict = 0;
     draw->core.gc = 0;
+    draw->core.use_pixmap = 0;
     draw->clip_type = XftClipTypeNone;
     draw->subwindow_mode = ClipByChildren;
     XftMemAlloc (XFT_MEM_DRAW, sizeof (XftDraw));
@@ -807,7 +809,7 @@ XftDrawRect (XftDraw		*draw,
 {
     if (_XftDrawRenderPrepare (draw))
     {
-	XRenderFillRectangle (draw->dpy, PictOpOver, draw->render.pict,
+	XRenderFillRectangle (draw->dpy, PictOpSrc, draw->render.pict,
 			      &color->color, x, y, width, height);
     }
     else if (_XftDrawCorePrepare (draw, color))
@@ -914,7 +916,10 @@ XftDrawSetClipRectangles (XftDraw		*draw,
     /*
      * Check for quick exit
      */
-    if (draw->clip_type == XftClipTypeRectangles && 
+    if (draw->clip_type == XftClipTypeRectangles &&
+	draw->clip.rect->n == n &&
+	(n == 0 || (draw->clip.rect->xOrigin == xOrigin &&
+		    draw->clip.rect->yOrigin == yOrigin)) &&
 	!memcmp (XftClipRects (draw->clip.rect), rects, n * sizeof (XRectangle)))
     {
 	return True;

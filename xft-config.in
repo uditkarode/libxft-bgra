@@ -3,9 +3,8 @@
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 libdir="@libdir@"
-hardcode_libdir_flag_spec=@hardcode_libdir_flag_spec@
 includedir="@includedir@"
-version="@PACKAGE_VERSION@"
+version="@VERSION@"
 freetypelibs="@FREETYPE_LIBS@"
 freetypecflags="@FREETYPE_CFLAGS@"
 fontconfiglibs="@FONTCONFIG_LIBS@"
@@ -90,9 +89,9 @@ if test "$echo_cflags" = "yes" ; then
 fi
 
 if test "$echo_libs" = "yes" ; then
- libs="-lXft ${freetypelibs} ${fontconfiglibs} ${xrenderlibs}"
+ libs="-lXft -lX11 ${freetypelibs} ${fontconfiglibs} ${xrenderlibs}"
  if test "${libdir}" != "/usr/lib" ; then
-  echo ${hardcode_libdir_flag_spec} -L${libdir} $libs
+  echo -L${libdir} $libs
  else
   echo $libs
  fi

@@ -1,7 +1,6 @@
 /*
- * $XFree86: xc/lib/Xft/xftint.h,v 1.37 2002/10/11 17:53:02 keithp Exp $
  *
- * Copyright � 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -32,6 +31,10 @@
 
 #ifndef _XFTINT_H_
 #define _XFTINT_H_
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
