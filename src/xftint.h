@@ -43,6 +43,15 @@
 #include <fontconfig/fcprivate.h>
 #include <fontconfig/fcfreetype.h>
 
+#ifndef HAVE_CONFIG_H
+# if (FREETYPE_MAJOR > 2 ||						    \
+      (FREETYPE_MAJOR == 2 && (FREETYPE_MINOR > 1 ||			    \
+			       (FREETYPE_MINOR == 1 && FREETYPE_PATCH >= 5))))
+#  define HAVE_FT_BITMAP_SIZE_Y_PPEM 1
+# else
+#  define HAVE_FT_BITMAP_SIZE_Y_PPEM 0
+#endif
+
 typedef struct _XftMatcher {
     char    *object;
     double  (*compare) (char *object, FcValue value1, FcValue value2);
