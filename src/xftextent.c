@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/lib/Xft/xftextent.c,v 1.10 2002/12/14 01:59:38 dawes Exp $
+ * $XFree86$
  *
  * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
