@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/lib/Xft/xftdpy.c,v 1.20 2002/10/11 17:53:02 keithp Exp $
+ * $XFree86: xc/lib/Xft/xftdpy.c,v 1.18 2002/10/02 07:02:32 keithp Exp $
  *
  * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
  *

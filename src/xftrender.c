@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/lib/Xft/xftrender.c,v 1.15 2002/12/14 01:59:38 dawes Exp $
+ * $XFree86: xc/lib/Xft/xftrender.c,v 1.14 2002/10/11 17:53:02 keithp Exp $
  *
  * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
  *

@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/lib/Xft/xftfont.c,v 1.11 2002/10/11 17:53:02 keithp Exp $
+ * $XFree86: xc/lib/Xft/xftfont.c,v 1.9 2002/02/15 07:36:11 keithp Exp $
  *
  * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
