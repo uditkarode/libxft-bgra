@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/lib/Xft/xftcolor.c,v 1.1 2000/12/01 03:27:57 keithp Exp $
+ * $XFree86: xc/lib/Xft/xftcolor.c,v 1.3 2002/10/11 17:53:02 keithp Exp $
  *
  * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
  *
