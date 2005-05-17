@@ -44,6 +44,9 @@
 
 #include <X11/Xfuncproto.h>
 /* #include <X11/Xosdefs.h>*/
+#ifndef _X_SENTINEL
+# define _X_SENTINEL(x)
+#endif
 
 #ifndef _XFT_NO_COMPAT_
 #include <X11/Xft/XftCompat.h>
@@ -346,7 +349,7 @@ XftFontMatch (Display		*dpy,
 	      FcResult		*result);
 
 XftFont *
-XftFontOpen (Display *dpy, int screen, ...);
+XftFontOpen (Display *dpy, int screen, ...) _X_SENTINEL(0);
 
 XftFont *
 XftFontOpenName (Display *dpy, int screen, _Xconst char *name);
@@ -441,7 +444,7 @@ XftGetVersion (void);
 FcFontSet *
 XftListFonts (Display	*dpy,
 	      int	screen,
-	      ...);
+	      ...) _X_SENTINEL(0);
 
 /* xftmatch.c */
 
