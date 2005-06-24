@@ -1,6 +1,7 @@
 /*
+ * $Id$
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -21,12 +22,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "xftint.h"
 #include <freetype/ftoutln.h>
-#include <fontconfig/fcfreetype.h>
 
 static const int    filters[3][3] = {
     /* red */
@@ -172,6 +169,13 @@ XftFontLoadGlyphs (Display	    *dpy,
 		
 	glyphslot = face->glyph;
 
+#if HAVE_FT_GLYPHSLOT_EMBOLDEN
+	/*
+	 * Embolden if required
+	 */
+	if (font->info.embolden) FT_GlyphSlot_Embolden(glyphslot);
+#endif
+
 	/*
 	 * Compute glyph metrics from FreeType information
 	 */
@@ -219,10 +223,10 @@ XftFontLoadGlyphs (Display	    *dpy,
 	height = TRUNC( top - bottom );
 
 	/*
-	 * Try to keep monospace fonts ink-inside
+	 * Clip charcell glyphs to the bounding box
 	 * XXX transformed?
 	 */
-	if (font->info.spacing != FC_PROPORTIONAL && !font->info.transform)
+	if (font->info.spacing >= FC_CHARCELL && !font->info.transform)
 	{
 	    if (font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT)
 	    {
@@ -266,7 +270,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 	xftg->metrics.x = -TRUNC(left);
 	xftg->metrics.y = TRUNC(top);
 
-	if (font->info.spacing != FC_PROPORTIONAL)
+	if (font->info.spacing >= FC_MONO)
 	{
 	    if (font->info.transform)
 	    {

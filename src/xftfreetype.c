@@ -1,7 +1,7 @@
 /*
- * $XFree86: xc/lib/Xft/xftfreetype.c,v 1.29tsi Exp $
+ * $Id$
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -22,11 +22,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "xftint.h"
-#include <X11/Xlibint.h>
 
 FT_Library  _XftFTlibrary;
 
@@ -289,8 +285,8 @@ _XftReleaseFile (XftFtFile *f)
 	if (f->face)
 	    FT_Done_Face (f->face);
     }
-    XftMemFree (XFT_MEM_FILE,
-		sizeof (XftFtFile) + f->file ? strlen (f->file) + 1 : 0);
+    XftMemFree (XFT_MEM_FILE, 
+		sizeof (XftFtFile) + (f->file ? strlen (f->file) + 1 : 0));
     free (f);
 }
 
@@ -528,6 +524,20 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
 	goto bail1;
     }
 
+#ifdef FC_EMBOLDEN
+    switch (FcPatternGetBool (pattern, FC_EMBOLDEN, 0, &fi->embolden)) {
+    case FcResultNoMatch:
+	fi->embolden = FcFalse;
+	break;
+    case FcResultMatch:
+	break;
+    default:
+	goto bail1;
+    }
+#else
+    fi->embolden = FcFalse;
+#endif
+    
 #ifdef FC_HINT_STYLE
     switch (FcPatternGetInteger (pattern, FC_HINT_STYLE, 0, &hint_style)) {
     case FcResultNoMatch:
@@ -747,7 +757,7 @@ XftFontOpenInfo (Display	*dpy,
     FT_Face		face;
     XftFont		**bucket;
     XftFontInt		*font;
-    XRenderPictFormat	pf, *format;
+    XRenderPictFormat	*format;
     FcCharSet		*charset;
     FcChar32		num_unicode;
     FcChar32		hash_value;
@@ -808,7 +818,7 @@ XftFontOpenInfo (Display	*dpy,
     antialias = fi->antialias;
     if (!(face->face_flags & FT_FACE_FLAG_SCALABLE))
 	antialias = FcFalse;
-    
+
     /*
      * Find the appropriate picture format
      */

@@ -1,6 +1,7 @@
 /*
+ * $Id$
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -21,10 +22,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <X11/Xlibint.h>
 #include "xftint.h"
 
 XftDisplayInfo	*_XftDisplayInfo;
@@ -100,6 +97,7 @@ _XftDisplayInfoGet (Display *dpy, FcBool createIfNecessary)
 
     info->display = dpy;
     info->defaults = 0;
+    info->solidFormat = 0;
     info->hasRender = (XRenderQueryExtension (dpy, &event_base, &error_base) &&
 		       (XRenderFindVisualFormat (dpy, DefaultVisual (dpy, DefaultScreen (dpy))) != 0));
     info->use_free_glyphs = FcTrue;
@@ -109,22 +107,23 @@ _XftDisplayInfoGet (Display *dpy, FcBool createIfNecessary)
 	XRenderQueryVersion (dpy, &major, &minor);
 	if (major < 0 || (major == 0 && minor <= 2))
 	    info->use_free_glyphs = FcFalse;
+
+	pf.type = PictTypeDirect;
+	pf.depth = 32;
+	pf.direct.redMask = 0xff;
+	pf.direct.greenMask = 0xff;
+	pf.direct.blueMask = 0xff;
+	pf.direct.alphaMask = 0xff;
+	info->solidFormat = XRenderFindFormat (dpy,
+					       (PictFormatType|
+						PictFormatDepth|
+						PictFormatRedMask|
+						PictFormatGreenMask|
+						PictFormatBlueMask|
+						PictFormatAlphaMask),
+					       &pf,
+					       0);
     }
-    pf.type = PictTypeDirect;
-    pf.depth = 32;
-    pf.direct.redMask = 0xff;
-    pf.direct.greenMask = 0xff;
-    pf.direct.blueMask = 0xff;
-    pf.direct.alphaMask = 0xff;
-    info->solidFormat = XRenderFindFormat (dpy,
-					   (PictFormatType|
-					    PictFormatDepth|
-					    PictFormatRedMask|
-					    PictFormatGreenMask|
-					    PictFormatBlueMask|
-					    PictFormatAlphaMask),
-					   &pf,
-					   0);
     if (XftDebug () & XFT_DBG_RENDER)
     {
 	Visual		    *visual = DefaultVisual (dpy, DefaultScreen (dpy));
@@ -374,6 +373,10 @@ _XftDefaultInit (Display *dpy)
 	goto bail1;
     if (!_XftDefaultInitBool (dpy, pat, FC_ANTIALIAS))
 	goto bail1;
+#ifdef FC_EMBOLDEN
+    if (!_XftDefaultInitBool (dpy, pat, FC_EMBOLDEN))
+	goto bail1;
+#endif
     if (!_XftDefaultInitBool (dpy, pat, FC_AUTOHINT))
 	goto bail1;
 #ifdef FC_HINT_STYLE
@@ -470,6 +473,14 @@ XftDefaultSubstitute (Display *dpy, int screen, FcPattern *pattern)
 			   XftDefaultGetBool (dpy, FC_ANTIALIAS, screen,
 					      True));
     }
+#ifdef FC_EMBOLDEN
+    if (FcPatternGet (pattern, FC_EMBOLDEN, 0, &v) == FcResultNoMatch)
+    {
+	FcPatternAddBool (pattern, FC_EMBOLDEN,
+			   XftDefaultGetBool (dpy, FC_EMBOLDEN, screen,
+					      False));
+    }
+#endif
     if (FcPatternGet (pattern, FC_HINTING, 0, &v) == FcResultNoMatch)
     {
 	FcPatternAddBool (pattern, FC_HINTING,
@@ -494,15 +505,18 @@ XftDefaultSubstitute (Display *dpy, int screen, FcPattern *pattern)
     {
 	int	subpixel = FC_RGBA_UNKNOWN;
 #if RENDER_MAJOR > 0 || RENDER_MINOR >= 6
-	int render_order = XRenderQuerySubpixelOrder (dpy, screen);
-	switch (render_order) {
-	default:
-	case SubPixelUnknown:		subpixel = FC_RGBA_UNKNOWN; break;
-	case SubPixelHorizontalRGB:	subpixel = FC_RGBA_RGB; break;
-	case SubPixelHorizontalBGR:	subpixel = FC_RGBA_BGR; break;
-	case SubPixelVerticalRGB:	subpixel = FC_RGBA_VRGB; break;
-	case SubPixelVerticalBGR:	subpixel = FC_RGBA_VBGR; break;
-	case SubPixelNone:		subpixel = FC_RGBA_NONE; break;
+	if (XftDefaultHasRender (dpy))
+	{
+	    int render_order = XRenderQuerySubpixelOrder (dpy, screen);
+	    switch (render_order) {
+	    default:
+	    case SubPixelUnknown:	subpixel = FC_RGBA_UNKNOWN; break;
+	    case SubPixelHorizontalRGB:	subpixel = FC_RGBA_RGB; break;
+	    case SubPixelHorizontalBGR:	subpixel = FC_RGBA_BGR; break;
+	    case SubPixelVerticalRGB:	subpixel = FC_RGBA_VRGB; break;
+	    case SubPixelVerticalBGR:	subpixel = FC_RGBA_VBGR; break;
+	    case SubPixelNone:		subpixel = FC_RGBA_NONE; break;
+	    }
 	}
 #endif
 	FcPatternAddInteger (pattern, FC_RGBA,

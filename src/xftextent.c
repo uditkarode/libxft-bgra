@@ -1,7 +1,7 @@
 /*
- * $XFree86: xc/lib/Xft/xftextent.c,v 1.9 2002/10/11 17:53:02 keithp Exp $
+ * $Id$
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -22,8 +22,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
 #include "xftint.h"
    
 void
@@ -66,14 +64,12 @@ XftGlyphExtents (Display	    *dpy,
 	    (xftg = font->glyphs[glyph]))
 	    break;
     }
-    if (n == 0 && !xftg)
+    if (n == 0)
     {
-	extents->width = 0;
-	extents->height = 0;
-	extents->x = 0;
-	extents->y = 0;
-	extents->yOff = 0;
-	extents->xOff = 0;
+	if (xftg)
+	    *extents = xftg->metrics;
+	else
+	    memset (extents, '\0', sizeof (*extents));
     }
     else
     {

@@ -1,7 +1,7 @@
 /*
- * $XFree86: xc/lib/Xft/xftfont.c,v 1.9 2002/02/15 07:36:11 keithp Exp $
+ * $Id$
  *
- * Copyright © 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -22,8 +22,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "xftint.h"
 
 FcPattern *

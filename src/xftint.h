@@ -1,6 +1,7 @@
 /*
+ * $Id$
  *
- * Copyright Â© 2000 Keith Packard, member of The XFree86 Project, Inc.
+ * Copyright © 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -26,7 +27,7 @@
  * and constitute no kind of standard.  If you need any of these functions,
  * please drop me a note.  Either the library needs new functionality,
  * or there's a way to do what you need using the existing published
- * interfaces. keithp@xfree86.org
+ * interfaces. keithp@freedesktop.org
  */
 
 #ifndef _XFTINT_H_
@@ -34,10 +35,28 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#else /* X monolithic tree */
+#define HAVE_STDLIB_H 1  /* assumed since all ANSI C platforms require it */
+#include <X11/Xosdefs.h> /* get string.h or strings.h as appropriate */
 #endif
 
+#include <stdio.h>
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+#if HAVE_STRING_H
+#include <string.h>
+#else
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+#endif
+#include <ctype.h>
+
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/Xmd.h>
+#include <X11/Xlibint.h>
 #define _XFT_NO_COMPAT_
 #include "Xft.h"
 #include <fontconfig/fcprivate.h>
@@ -118,6 +137,7 @@ struct _XftFontInfo {
      */
     FT_F26Dot6		xsize, ysize;	/* pixel size */
     FcBool		antialias;	/* doing antialiasing */
+    FcBool		embolden;	/* force emboldening */
     int			rgba;		/* subpixel order */
     FT_Matrix		matrix;		/* glyph transformation matrix */
     FcBool		transform;	/* non-identify matrix? */
