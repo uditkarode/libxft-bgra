@@ -32,7 +32,7 @@ dnl Yes, it is a pain to synchronize version numbers.  Unfortunately, it's
 dnl not possible to extract the version number here from Xft.h
 dnl Please bump the minor library number at each release as well.
 dnl
-AC_INIT(libXft, 2.1.7, [keithp@keithp.com], libXft)
+AC_INIT(libXft, 2.1.7, [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], libXft)
 AC_CONFIG_AUX_DIR(.)
 
 AM_INIT_AUTOMAKE([dist-bzip2])
@@ -124,6 +124,8 @@ if test "x$GCC" = "xyes"; then
 	-Wnested-externs -fno-strict-aliasing"
 fi
 AC_SUBST(WARN_CFLAGS)
+
+XORG_RELEASE_VERSION
 
 AC_OUTPUT([Makefile
 	   xft.pc
