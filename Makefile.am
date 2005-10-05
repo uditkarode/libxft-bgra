@@ -28,4 +28,6 @@ bin_SCRIPTS = xft-config
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = xft.pc
 
+CLEANFILES = xft-config
+
 EXTRA_DIST = xft-config.in xft.pc.in autogen.sh
