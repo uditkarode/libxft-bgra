@@ -82,7 +82,7 @@ XftGetInt(const char *ptr, int *val)
     return (char *) 0;
 }
 
-FcPattern *
+_X_EXPORT FcPattern *
 XftXlfdParse (const char *xlfd_orig, FcBool ignore_scalable, FcBool complete)
 {
     FcPattern	*pat;

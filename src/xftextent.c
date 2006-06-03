@@ -24,7 +24,7 @@
 
 #include "xftint.h"
    
-void
+_X_EXPORT void
 XftGlyphExtents (Display	    *dpy,
 		 XftFont	    *pub,
 		 _Xconst FT_UInt    *glyphs,
@@ -115,7 +115,7 @@ XftGlyphExtents (Display	    *dpy,
 
 #define NUM_LOCAL   1024
 
-void
+_X_EXPORT void
 XftTextExtents8 (Display	    *dpy,
 		 XftFont	    *pub,
 		 _Xconst FcChar8    *string, 
@@ -143,7 +143,7 @@ XftTextExtents8 (Display	    *dpy,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftTextExtents16 (Display	    *dpy,
 		  XftFont	    *pub,
 		  _Xconst FcChar16  *string, 
@@ -171,7 +171,7 @@ XftTextExtents16 (Display	    *dpy,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftTextExtents32 (Display	    *dpy,
 		  XftFont	    *pub,
 		  _Xconst FcChar32  *string, 
@@ -199,7 +199,7 @@ XftTextExtents32 (Display	    *dpy,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftTextExtentsUtf8 (Display	    *dpy,
 		    XftFont	    *pub,
 		    _Xconst FcChar8 *string, 
@@ -242,7 +242,7 @@ XftTextExtentsUtf8 (Display	    *dpy,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftTextExtentsUtf16 (Display		*dpy,
 		     XftFont		*pub,
 		     _Xconst FcChar8	*string, 

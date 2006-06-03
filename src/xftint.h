@@ -62,6 +62,14 @@
 #include <fontconfig/fcprivate.h>
 #include <fontconfig/fcfreetype.h>
 
+/* Added to <X11/Xfuncproto.h> in X11R6.9 and later */
+#ifndef _X_HIDDEN
+# define _X_HIDDEN /**/
+#endif
+#ifndef _X_EXPORT
+# define _X_EXPORT /**/
+#endif
+
 #ifndef HAVE_CONFIG_H
 # if (FREETYPE_MAJOR > 2 ||						    \
       (FREETYPE_MAJOR == 2 && (FREETYPE_MINOR > 1 ||			    \

@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-int
+_X_HIDDEN int
 XftNativeByteOrder (void)
 {
     int	    whichbyte = 1;
@@ -55,7 +55,7 @@ XftNativeByteOrder (void)
 		 ((char *) (x))[0] = ((char *) (x))[2];\
 		 ((char *) (x))[2] = n; }
 
-void
+_X_HIDDEN void
 XftSwapCARD32 (CARD32 *data, int u)
 {
     char    n;
@@ -66,7 +66,7 @@ XftSwapCARD32 (CARD32 *data, int u)
     }
 }
 
-void
+_X_HIDDEN void
 XftSwapCARD24 (CARD8 *data, int width, int height)
 {
     int	    units, u;
@@ -87,7 +87,7 @@ XftSwapCARD24 (CARD8 *data, int width, int height)
     }
 }
 
-void
+_X_HIDDEN void
 XftSwapCARD16 (CARD16 *data, int u)
 {
     char    n;
@@ -98,7 +98,7 @@ XftSwapCARD16 (CARD16 *data, int u)
     }
 }
 
-void
+_X_HIDDEN void
 XftSwapImage (XImage *image)
 {
     switch (image->bits_per_pixel) {

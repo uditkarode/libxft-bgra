@@ -82,7 +82,7 @@ _XftDrawScreen (Display *dpy, Drawable drawable, Visual *visual)
     return 0;
 }
 
-unsigned int
+_X_HIDDEN unsigned int
 XftDrawDepth (XftDraw *draw)
 {
     if (!draw->depth)
@@ -98,7 +98,7 @@ XftDrawDepth (XftDraw *draw)
     return draw->depth;
 }
 
-unsigned int
+_X_HIDDEN unsigned int
 XftDrawBitsPerPixel (XftDraw	*draw)
 {
     if (!draw->bits_per_pixel)
@@ -126,7 +126,7 @@ XftDrawBitsPerPixel (XftDraw	*draw)
     return draw->bits_per_pixel;
 }
 
-XftDraw *
+_X_EXPORT XftDraw *
 XftDrawCreate (Display   *dpy,
 	       Drawable  drawable,
 	       Visual    *visual,
@@ -154,7 +154,7 @@ XftDrawCreate (Display   *dpy,
     return draw;
 }
 
-XftDraw *
+_X_EXPORT XftDraw *
 XftDrawCreateBitmap (Display	*dpy,
 		     Pixmap	bitmap)
 {
@@ -179,7 +179,7 @@ XftDrawCreateBitmap (Display	*dpy,
     return draw;
 }
 
-XftDraw *
+_X_EXPORT XftDraw *
 XftDrawCreateAlpha (Display *dpy,
 		    Pixmap  pixmap,
 		    int	    depth)
@@ -233,7 +233,7 @@ _XftDrawFormat (XftDraw	*draw)
 	return XRenderFindVisualFormat (draw->dpy, draw->visual);
 }
 
-void
+_X_EXPORT void
 XftDrawChange (XftDraw	*draw,
 	       Drawable	drawable)
 {
@@ -250,31 +250,31 @@ XftDrawChange (XftDraw	*draw,
     }
 }
 
-Display *
+_X_EXPORT Display *
 XftDrawDisplay (XftDraw *draw)
 {
     return draw->dpy;
 }
 
-Drawable
+_X_EXPORT Drawable
 XftDrawDrawable (XftDraw *draw)
 {
     return draw->drawable;
 }
 
-Colormap
+_X_EXPORT Colormap
 XftDrawColormap (XftDraw *draw)
 {
     return draw->colormap;
 }
 
-Visual *
+_X_EXPORT Visual *
 XftDrawVisual (XftDraw *draw)
 {
     return draw->visual;
 }
 
-void
+_X_EXPORT void
 XftDrawDestroy (XftDraw	*draw)
 {
     if (draw->render.pict)
@@ -295,7 +295,7 @@ XftDrawDestroy (XftDraw	*draw)
     free (draw);
 }
 
-Picture
+_X_EXPORT Picture
 XftDrawSrcPicture (XftDraw *draw, _Xconst XftColor *color)
 {
     Display	    *dpy = draw->dpy;
@@ -457,7 +457,7 @@ _XftDrawCorePrepare (XftDraw *draw, _Xconst XftColor *color)
     return FcTrue;
 }
 			
-Picture
+_X_EXPORT Picture
 XftDrawPicture (XftDraw *draw)
 {
     if (!_XftDrawRenderPrepare (draw))
@@ -467,7 +467,7 @@ XftDrawPicture (XftDraw *draw)
 
 #define NUM_LOCAL   1024
 
-void
+_X_EXPORT void
 XftDrawGlyphs (XftDraw		*draw,
 	       _Xconst XftColor	*color,
 	       XftFont		*pub,
@@ -495,7 +495,7 @@ XftDrawGlyphs (XftDraw		*draw,
     }
 }
 
-void
+_X_EXPORT void
 XftDrawString8 (XftDraw		    *draw,
 		_Xconst XftColor    *color,
 		XftFont		    *pub,
@@ -525,7 +525,7 @@ XftDrawString8 (XftDraw		    *draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawString16 (XftDraw	    *draw,
 		 _Xconst XftColor   *color,
 		 XftFont	    *pub,
@@ -553,7 +553,7 @@ XftDrawString16 (XftDraw	    *draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawString32 (XftDraw	    *draw,
 		 _Xconst XftColor   *color,
 		 XftFont	    *pub,
@@ -581,7 +581,7 @@ XftDrawString32 (XftDraw	    *draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawStringUtf8 (XftDraw	    *draw,
 		   _Xconst XftColor *color,
 		   XftFont	    *pub,
@@ -625,7 +625,7 @@ XftDrawStringUtf8 (XftDraw	    *draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawStringUtf16 (XftDraw		*draw,
 		    _Xconst XftColor	*color,
 		    XftFont		*pub,
@@ -670,7 +670,7 @@ XftDrawStringUtf16 (XftDraw		*draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawGlyphSpec (XftDraw		*draw,
 		  _Xconst XftColor	*color,
 		  XftFont		*pub,
@@ -698,7 +698,7 @@ XftDrawGlyphSpec (XftDraw		*draw,
     }
 }
 
-void
+_X_EXPORT void
 XftDrawGlyphFontSpec (XftDraw			*draw,
 		      _Xconst XftColor		*color,
 		      _Xconst XftGlyphFontSpec	*glyphs,
@@ -734,7 +734,7 @@ XftDrawGlyphFontSpec (XftDraw			*draw,
     }
 }
 
-void
+_X_EXPORT void
 XftDrawCharSpec (XftDraw		*draw,
 		 _Xconst XftColor	*color,
 		 XftFont		*pub,
@@ -764,7 +764,7 @@ XftDrawCharSpec (XftDraw		*draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawCharFontSpec (XftDraw			*draw,
 		     _Xconst XftColor		*color,
 		     _Xconst XftCharFontSpec	*chars,
@@ -794,7 +794,7 @@ XftDrawCharFontSpec (XftDraw			*draw,
 	free (glyphs);
 }
 
-void
+_X_EXPORT void
 XftDrawRect (XftDraw		*draw,
 	     _Xconst XftColor	*color,
 	     int		x, 
@@ -813,7 +813,7 @@ XftDrawRect (XftDraw		*draw,
     }
 }
 
-Bool
+_X_EXPORT Bool
 XftDrawSetClip (XftDraw	*draw,
 		Region	r)
 {
@@ -899,7 +899,7 @@ XftDrawSetClip (XftDraw	*draw,
     return True;
 }
 
-Bool
+_X_EXPORT Bool
 XftDrawSetClipRectangles (XftDraw		*draw,
 			  int			xOrigin,
 			  int			yOrigin,
@@ -974,7 +974,7 @@ XftDrawSetClipRectangles (XftDraw		*draw,
     return True;
 }
 
-void
+_X_EXPORT void
 XftDrawSetSubwindowMode (XftDraw *draw, int mode)
 {
     if (mode == draw->subwindow_mode)

@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-int
+_X_HIDDEN int
 _XftMatchSymbolic (XftSymbolic *s, int n, const char *name, int def)
 {
     while (n--)

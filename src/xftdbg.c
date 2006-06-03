@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-int
+_X_HIDDEN int
 XftDebug (void)
 {
     static int  initialized;

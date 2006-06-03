@@ -24,9 +24,9 @@
 
 #include "xftint.h"
 
-Bool	    _XftConfigInitialized;
+_X_HIDDEN Bool	    _XftConfigInitialized;
 
-Bool
+_X_EXPORT Bool
 XftInit (_Xconst char *config)
 {
     if (_XftConfigInitialized)
@@ -38,7 +38,7 @@ XftInit (_Xconst char *config)
     return True;
 }
 
-int
+_X_EXPORT int
 XftGetVersion (void)
 {
     return XftVersion;
@@ -64,7 +64,7 @@ static int  XftMemNotice = 1*1024*1024;
 
 static int  XftAllocNotify, XftFreeNotify;
 
-void
+_X_HIDDEN void
 XftMemReport (void)
 {
     int	i;
@@ -84,7 +84,7 @@ XftMemReport (void)
     XftFreeNotify = 0;
 }
 
-void
+_X_HIDDEN void
 XftMemAlloc (int kind, int size)
 {
     if (XftDebug() & XFT_DBG_MEMORY)
@@ -99,7 +99,7 @@ XftMemAlloc (int kind, int size)
     }
 }
 
-void
+_X_HIDDEN void
 XftMemFree (int kind, int size)
 {
     if (XftDebug() & XFT_DBG_MEMORY)

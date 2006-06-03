@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-Bool
+_X_EXPORT Bool
 XftColorAllocName (Display  *dpy,
 		   _Xconst Visual   *visual,
 		   Colormap cmap,
@@ -73,7 +73,7 @@ masklen (unsigned long m)
     return (short) (((y + (y >> 3)) & 030707070707) % 077);
 }
 
-Bool
+_X_EXPORT Bool
 XftColorAllocValue (Display	    *dpy,
 		    Visual	    *visual,
 		    Colormap	    cmap,
@@ -114,7 +114,7 @@ XftColorAllocValue (Display	    *dpy,
     return True;
 }
 
-void
+_X_EXPORT void 
 XftColorFree (Display	*dpy,
 	      Visual	*visual,
 	      Colormap	cmap,

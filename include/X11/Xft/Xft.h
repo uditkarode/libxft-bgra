@@ -33,7 +33,7 @@
 
 #define XFT_MAJOR	2
 #define XFT_MINOR	1
-#define XFT_REVISION	8
+#define XFT_REVISION	9
 #define XFT_VERSION	((XFT_MAJOR * 10000) + (XFT_MINOR * 100) + (XFT_REVISION))
 #define XftVersion	XFT_VERSION
 
@@ -429,16 +429,12 @@ XftCharIndex (Display	    *dpy,
 	      XftFont	    *pub,
 	      FcChar32	    ucs4);
     
-/* xftgram.y */
-
 /* xftinit.c */
 FcBool
 XftInit (_Xconst char *config);
 
 int
 XftGetVersion (void);
-
-/* xftlex.l */
 
 /* xftlist.c */
 
@@ -447,15 +443,9 @@ XftListFonts (Display	*dpy,
 	      int	screen,
 	      ...) _X_SENTINEL(0);
 
-/* xftmatch.c */
-
-/* xftmatrix.c */
-
 /* xftname.c */
 FcPattern 
 *XftNameParse (_Xconst char *name);
-
-/* xftpat.c */
 
 /* xftrender.c */
 void

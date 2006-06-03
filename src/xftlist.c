@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-FcFontSet *
+_X_HIDDEN FcFontSet *
 XftListFontsPatternObjects (Display	    *dpy,
 			    int		    screen,
 			    FcPattern	    *pattern,
@@ -33,7 +33,7 @@ XftListFontsPatternObjects (Display	    *dpy,
     return FcFontList (0, pattern, os);
 }
 
-FcFontSet *
+_X_EXPORT FcFontSet *
 XftListFonts (Display	*dpy,
 	      int	screen,
 	      ...)

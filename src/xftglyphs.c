@@ -67,7 +67,7 @@ _XftFontValidateMemory (Display *dpy, XftFont *public)
 		font->glyph_memory, glyph_memory);
 }
 
-void
+_X_EXPORT void
 XftFontLoadGlyphs (Display	    *dpy,
 		   XftFont	    *pub,
 		   FcBool	    need_bitmaps,
@@ -608,7 +608,7 @@ XftFontLoadGlyphs (Display	    *dpy,
     XftUnlockFace (&font->public);
 }
 
-void
+_X_EXPORT void
 XftFontUnloadGlyphs (Display		*dpy,
 		     XftFont		*pub,
 		     _Xconst FT_UInt	*glyphs,
@@ -659,7 +659,7 @@ XftFontUnloadGlyphs (Display		*dpy,
 	XRenderFreeGlyphs (dpy, font->glyphset, glyphBuf, nused);
 }
 
-FcBool
+_X_EXPORT FcBool
 XftFontCheckGlyph (Display	*dpy,
 		   XftFont	*pub,
 		   FcBool	need_bitmaps,
@@ -700,7 +700,7 @@ XftFontCheckGlyph (Display	*dpy,
 	return FcFalse;
 }
 
-FcBool
+_X_EXPORT FcBool
 XftCharExists (Display	    *dpy,
 	       XftFont	    *pub,
 	       FcChar32    ucs4)
@@ -712,7 +712,7 @@ XftCharExists (Display	    *dpy,
 
 #define Missing	    ((FT_UInt) ~0)
 
-FT_UInt
+_X_EXPORT FT_UInt
 XftCharIndex (Display	    *dpy, 
 	      XftFont	    *pub,
 	      FcChar32	    ucs4)
@@ -756,7 +756,7 @@ XftCharIndex (Display	    *dpy,
 /*
  * Pick a random glyph from the font and remove it from the cache
  */
-void
+_X_HIDDEN void
 _XftFontUncacheGlyph (Display *dpy, XftFont *pub)
 {
     XftFontInt	    *font = (XftFontInt *) pub;
@@ -804,7 +804,7 @@ _XftFontUncacheGlyph (Display *dpy, XftFont *pub)
 	_XftFontValidateMemory (dpy, pub);
 }
 
-void
+_X_HIDDEN void
 _XftFontManageMemory (Display *dpy, XftFont *pub)
 {
     XftFontInt	*font = (XftFontInt *) pub;

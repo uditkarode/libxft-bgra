@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-XftDisplayInfo	*_XftDisplayInfo;
+_X_HIDDEN XftDisplayInfo	*_XftDisplayInfo;
 
 static int
 _XftCloseDisplay (Display *dpy, XExtCodes *codes)
@@ -60,7 +60,7 @@ _XftCloseDisplay (Display *dpy, XExtCodes *codes)
 }
 
 
-XftDisplayInfo *
+_X_HIDDEN XftDisplayInfo *
 _XftDisplayInfoGet (Display *dpy, FcBool createIfNecessary)
 {
     XftDisplayInfo	*info, **prev;
@@ -212,7 +212,7 @@ _XftDisplayValidateMemory (XftDisplayInfo *info)
 		info->glyph_memory, glyph_memory);
 }
 
-void
+_X_HIDDEN void
 _XftDisplayManageMemory (Display *dpy)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, False);
@@ -250,7 +250,7 @@ _XftDisplayManageMemory (Display *dpy)
 	_XftDisplayValidateMemory (info);
 }
 
-Bool
+_X_EXPORT Bool
 XftDefaultHasRender (Display *dpy)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, True);
@@ -260,7 +260,7 @@ XftDefaultHasRender (Display *dpy)
     return info->hasRender;
 }
 
-Bool
+_X_EXPORT Bool
 XftDefaultSet (Display *dpy, FcPattern *defaults)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, True);
@@ -283,7 +283,7 @@ XftDefaultSet (Display *dpy, FcPattern *defaults)
     return True;
 }
 
-int
+_X_HIDDEN int
 XftDefaultParseBool (char *v)
 {
     char    c0, c1;
@@ -419,7 +419,7 @@ _XftDefaultGet (Display *dpy, const char *object, int screen, FcValue *v)
     return r;
 }
 
-Bool
+_X_HIDDEN Bool
 XftDefaultGetBool (Display *dpy, const char *object, int screen, Bool def)
 {
     FcResult	    r;
@@ -431,7 +431,7 @@ XftDefaultGetBool (Display *dpy, const char *object, int screen, Bool def)
     return v.u.b;
 }
 
-int
+_X_HIDDEN int
 XftDefaultGetInteger (Display *dpy, const char *object, int screen, int def)
 {
     FcResult	    r;
@@ -443,7 +443,7 @@ XftDefaultGetInteger (Display *dpy, const char *object, int screen, int def)
     return v.u.i;
 }
 
-double
+_X_HIDDEN double
 XftDefaultGetDouble (Display *dpy, const char *object, int screen, double def)
 {
     FcResult	    r;
@@ -455,7 +455,7 @@ XftDefaultGetDouble (Display *dpy, const char *object, int screen, double def)
     return v.u.d;
 }
 
-void
+_X_EXPORT void
 XftDefaultSubstitute (Display *dpy, int screen, FcPattern *pattern)
 {
     FcValue	v;

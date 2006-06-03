@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-FT_Library  _XftFTlibrary;
+_X_HIDDEN FT_Library  _XftFTlibrary;
 
 #define FT_Matrix_Equal(a,b)	((a)->xx == (b)->xx && \
 				 (a)->yy == (b)->yy && \
@@ -35,7 +35,7 @@ FT_Library  _XftFTlibrary;
  */
 
 static XftFtFile *_XftFtFiles;
-int XftMaxFreeTypeFiles = 5;
+_X_HIDDEN int XftMaxFreeTypeFiles = 5;
 
 static XftFtFile *
 _XftGetFile (const FcChar8 *file, int id)
@@ -186,7 +186,7 @@ _XftUnlockFile (XftFtFile *f)
 #define Y_SIZE(face,i) ((face)->available_sizes[i].height << 6)
 #endif
 
-FcBool
+_X_HIDDEN FcBool
 _XftSetFace (XftFtFile *f, FT_F26Dot6 xsize, FT_F26Dot6 ysize, FT_Matrix *matrix)
 {
     FT_Face face = f->face;
@@ -345,7 +345,7 @@ _XftHashSize (FcChar32 num_unicode)
     return hash;
 }
 
-FT_Face
+_X_EXPORT FT_Face
 XftLockFace (XftFont *public)
 {
     XftFontInt	*font = (XftFontInt *) public;
@@ -364,7 +364,7 @@ XftLockFace (XftFont *public)
     return face;
 }
 
-void
+_X_EXPORT void
 XftUnlockFace (XftFont *public)
 {
     XftFontInt	*font = (XftFontInt *) public;
@@ -728,7 +728,7 @@ XftFontInfoCreate (Display *dpy, _Xconst FcPattern *pattern)
     return fi;
 }
 
-void
+_X_EXPORT void
 XftFontInfoDestroy (Display *dpy, XftFontInfo *fi)
 {
     XftFontInfoEmpty (dpy, fi);
@@ -736,19 +736,19 @@ XftFontInfoDestroy (Display *dpy, XftFontInfo *fi)
     free (fi);
 }
 
-FcChar32
+_X_EXPORT FcChar32
 XftFontInfoHash (_Xconst XftFontInfo *fi)
 {
     return fi->hash;
 }
     
-FcBool
+_X_EXPORT FcBool
 XftFontInfoEqual (_Xconst XftFontInfo *a, _Xconst XftFontInfo *b)
 {
     return memcmp ((void *) a, (void *) b, sizeof (XftFontInfo)) == 0;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontOpenInfo (Display	*dpy, 
 		 FcPattern	*pattern, 
 		 XftFontInfo	*fi)
@@ -1003,7 +1003,7 @@ bail0:
     return 0;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontOpenPattern (Display *dpy, FcPattern *pattern)
 {
     XftFontInfo	    info;
@@ -1017,7 +1017,7 @@ XftFontOpenPattern (Display *dpy, FcPattern *pattern)
     return font;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontCopy (Display *dpy, XftFont *public)
 {
     XftFontInt	    *font = (XftFontInt *) public;
@@ -1079,7 +1079,7 @@ XftFontFindNthUnref (XftDisplayInfo *info, int n)
     return public;
 }
 
-void
+_X_HIDDEN void
 XftFontManageMemory (Display *dpy)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, False);
@@ -1125,7 +1125,7 @@ XftFontManageMemory (Display *dpy)
     }
 }
 
-void
+_X_EXPORT void
 XftFontClose (Display *dpy, XftFont *public)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (dpy, False);
@@ -1145,7 +1145,7 @@ XftFontClose (Display *dpy, XftFont *public)
     }
 }
 
-FcBool
+_X_EXPORT FcBool
 XftInitFtLibrary (void)
 {
     if (_XftFTlibrary)

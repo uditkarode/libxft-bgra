@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-void
+_X_HIDDEN void
 XftRectCore (XftDraw		*draw,
 	     _Xconst XftColor	*color,
 	     int		x, 
@@ -930,7 +930,7 @@ static int XftGetImageErrorHandler (Display *dpy, XErrorEvent *error_event)
     return 0;
 }
 
-void
+_X_HIDDEN void
 XftGlyphCore (XftDraw		*draw,
 	      _Xconst XftColor	*color,
 	      XftFont		*public,
@@ -1066,7 +1066,7 @@ bail1:
 
 #define NUM_LOCAL   1024
 
-void
+_X_HIDDEN void
 XftGlyphSpecCore (XftDraw		*draw,
 		  _Xconst XftColor	*color,
 		  XftFont		*public,
@@ -1215,7 +1215,7 @@ bail1:
 	_XftFontManageMemory (dpy, public);
 }
 
-void
+_X_HIDDEN void
 XftGlyphFontSpecCore (XftDraw			*draw,
 		      _Xconst XftColor		*color,
 		      _Xconst XftGlyphFontSpec	*glyphs,

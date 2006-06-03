@@ -24,7 +24,7 @@
 
 #include "xftint.h"
 
-FcPattern *
+_X_EXPORT FcPattern *
 XftFontMatch (Display		*dpy,
 	      int		screen,
 	      _Xconst FcPattern *pattern,
@@ -68,7 +68,7 @@ XftFontMatch (Display		*dpy,
     return match;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontOpen (Display *dpy, int screen, ...)
 {
     va_list	    va;
@@ -114,7 +114,7 @@ XftFontOpen (Display *dpy, int screen, ...)
     return font;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontOpenName (Display *dpy, int screen, const char *name)
 {
     FcPattern	    *pat;
@@ -160,7 +160,7 @@ XftFontOpenName (Display *dpy, int screen, const char *name)
     return font;
 }
 
-XftFont *
+_X_EXPORT XftFont *
 XftFontOpenXlfd (Display *dpy, int screen, const char *xlfd)
 {
     FcPattern	    *pat;
