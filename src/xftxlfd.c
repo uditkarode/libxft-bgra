@@ -128,8 +128,10 @@ XftXlfdParse (const char *xlfd_orig, FcBool ignore_scalable, FcBool complete)
     
     save = (char *) malloc (strlen (foundry) + 1);
     
-    if (!save)
+    if (!save) {
+	FcPatternDestroy (pat);
 	return 0;
+    }
 
     if (!FcPatternAddString (pat, XFT_XLFD, (FcChar8 *) xlfd_orig)) goto bail;
     

@@ -210,7 +210,7 @@ _XftDrawFormat (XftDraw	*draw)
 {
     XftDisplayInfo  *info = _XftDisplayInfoGet (draw->dpy, True);
 
-    if (!info->hasRender)
+    if (!info || !info->hasRender)
 	return 0;
 
     if (draw->visual == 0)

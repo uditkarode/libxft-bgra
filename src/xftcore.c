@@ -921,7 +921,7 @@ _XftGlyphDefault (Display *dpy, XftFont   *public)
     if (XftFontCheckGlyph (dpy, public, FcTrue, 0, missing, &nmissing))
 	glyphs_loaded = FcTrue;
     if (nmissing)
-	XftFontLoadGlyphs (dpy, public, FcTrue, missing, nmissing);
+	XftFontLoadGlyphs (dpy, public, glyphs_loaded, missing, nmissing);
     return font->glyphs[0];
 }
 

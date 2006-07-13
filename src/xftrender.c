@@ -518,7 +518,7 @@ XftGlyphFontSpecRender (Display			    *dpy,
 	    break;
 	}
     }
-    if (i == nglyphs)
+    if (i == nglyphs || !firstFont)
 	goto bail2;
     glyph = firstFont->glyphs[g];
     format = firstFont->format;
