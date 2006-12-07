@@ -50,7 +50,7 @@ _X_EXPORT FcPattern
     return FcNameParse ((FcChar8 *) name); 
 }
 
-_X_HIDDEN FcBool
+_X_EXPORT FcBool
 XftNameUnparse (FcPattern *pat, char *dest, int len)
 {
     FcChar8 *name;
