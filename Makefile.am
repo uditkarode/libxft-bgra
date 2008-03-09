@@ -1,6 +1,4 @@
 #
-#  $Id$
-#
 #  Copyright © 2003 Keith Packard, Noah Levitt
 #
 #  Permission to use, copy, modify, distribute, and sell this software and its
