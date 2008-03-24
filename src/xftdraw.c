@@ -807,7 +807,10 @@ XftDrawRect (XftDraw		*draw,
     }
     else if (_XftDrawCorePrepare (draw, color))
     {
-	XftRectCore (draw, color, x, y, width, height);
+	/* note: not XftRectCore() */
+	XSetForeground (draw->dpy, draw->core.gc, color->pixel);
+	XFillRectangle (draw->dpy, draw->drawable, draw->core.gc,
+			x, y, width, height);
     }
 }
 
