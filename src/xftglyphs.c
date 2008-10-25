@@ -23,6 +23,10 @@
 #include "xftint.h"
 #include <freetype/ftoutln.h>
 
+#if HAVE_FT_GLYPHSLOT_EMBOLDEN
+#include <freetype/ftsynth.h>
+#endif
+
 static const int    filters[3][3] = {
     /* red */
 #if 0

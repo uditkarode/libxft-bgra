@@ -127,16 +127,6 @@ XftColorFree (Display	*dpy,
 	      Colormap	cmap,
 	      XftColor	*color);
 
-
-/* xftcore.c */
-
-/* xftdir.c */
-FcBool
-XftDirScan (FcFontSet *set, _Xconst char *dir, FcBool force);
-
-FcBool
-XftDirSave (FcFontSet *set, _Xconst char *dir);
-
 /* xftdpy.c */
 Bool
 XftDefaultHasRender (Display *dpy);
@@ -618,8 +608,6 @@ XftTextRenderUtf16 (Display	    *dpy,
 		    _Xconst FcChar8 *string,
 		    FcEndian	    endian,
 		    int		    len);
-
-/* xftstr.c */
 
 /* xftxlfd.c */
 FcPattern *
