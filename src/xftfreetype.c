@@ -385,6 +385,7 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
     FcChar32	    hash, *hashp;
     FT_Face	    face;
     int		    nhash;
+    FcBool	    bitmap;
 
     if (!info)
 	return FcFalse;
@@ -512,8 +513,22 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
      */
     fi->load_flags = FT_LOAD_DEFAULT;
 
+#ifndef XFT_EMBEDDED_BITMAP
+#define XFT_EMBEDDED_BITMAP "embeddedbitmap"
+#endif
+
+    switch (FcPatternGetBool (pattern, XFT_EMBEDDED_BITMAP, 0, &bitmap)) {
+    case FcResultNoMatch:
+	bitmap = FcFalse;
+	break;
+    case FcResultMatch:
+	break;
+    default:
+	goto bail1;
+    }
+
     /* disable bitmaps when anti-aliasing or transforming glyphs */
-    if (fi->antialias || fi->transform)
+    if ((!bitmap && fi->antialias) || fi->transform)
 	fi->load_flags |= FT_LOAD_NO_BITMAP;
     
     /* disable hinting if requested */
