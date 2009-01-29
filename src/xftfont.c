@@ -31,19 +31,19 @@ XftFontMatch (Display		*dpy,
     FcPattern	*new;
     FcPattern	*match;
 
-    if (!XftInit (0))
-	return 0;
+    if (!XftInit (NULL))
+	return NULL;
     
     new = FcPatternDuplicate (pattern);
     if (!new)
-	return 0;
+	return NULL;
 
     if (XftDebug () & XFT_DBG_OPENV)
     {
 	printf ("XftFontMatch pattern ");
 	FcPatternPrint (new);
     }
-    FcConfigSubstitute (0, new, FcMatchPattern);
+    FcConfigSubstitute (NULL, new, FcMatchPattern);
     if (XftDebug () & XFT_DBG_OPENV)
     {
 	printf ("XftFontMatch after FcConfig substitutions ");
@@ -55,8 +55,8 @@ XftFontMatch (Display		*dpy,
 	printf ("XftFontMatch after X resource substitutions ");
 	FcPatternPrint (new);
     }
-    
-    match = FcFontMatch (0, new, result);
+
+    match = FcFontMatch (NULL, new, result);
     if (XftDebug () & XFT_DBG_OPENV)
     {
 	printf ("XftFontMatch result ");
@@ -76,13 +76,13 @@ XftFontOpen (Display *dpy, int screen, ...)
     XftFont	    *font;
 
     va_start (va, screen);
-    pat = FcPatternVaBuild (0, va);
+    pat = FcPatternVaBuild (NULL, va);
     va_end (va);
     if (!pat)
     {
 	if (XftDebug () & XFT_DBG_OPEN)
 	    printf ("XftFontOpen: Invalid pattern argument\n");
-	return 0;
+	return NULL;
     }
     match = XftFontMatch (dpy, screen, pat, &result);
     if (XftDebug () & XFT_DBG_OPEN)
@@ -99,7 +99,7 @@ XftFontOpen (Display *dpy, int screen, ...)
     }
     FcPatternDestroy (pat);
     if (!match)
-	return 0;
+	return NULL;
     
     font = XftFontOpenPattern (dpy, match);
     if (!font)
@@ -131,7 +131,7 @@ XftFontOpenName (Display *dpy, int screen, const char *name)
     }
 			     
     if (!pat)
-	return 0;
+	return NULL;
     match = XftFontMatch (dpy, screen, pat, &result);
     if (XftDebug () & XFT_DBG_OPEN)
     {
@@ -145,7 +145,7 @@ XftFontOpenName (Display *dpy, int screen, const char *name)
     }
     FcPatternDestroy (pat);
     if (!match)
-	return 0;
+	return NULL;
     
     font = XftFontOpenPattern (dpy, match);
     if (!font)
@@ -177,7 +177,7 @@ XftFontOpenXlfd (Display *dpy, int screen, const char *xlfd)
     }
 			     
     if (!pat)
-	return 0;
+	return NULL;
     match = XftFontMatch (dpy, screen, pat, &result);
     if (XftDebug () & XFT_DBG_OPEN)
     {
@@ -191,7 +191,7 @@ XftFontOpenXlfd (Display *dpy, int screen, const char *xlfd)
     }
     FcPatternDestroy (pat);
     if (!match)
-	return 0;
+	return NULL;
     
     font = XftFontOpenPattern (dpy, match);
     if (!font)

@@ -33,7 +33,7 @@ _X_HIDDEN FT_Library  _XftFTlibrary;
  */
 
 static XftFtFile *_XftFtFiles;
-_X_HIDDEN int XftMaxFreeTypeFiles = 5;
+static int XftMaxFreeTypeFiles = 5;
 
 static XftFtFile *
 _XftGetFile (const FcChar8 *file, int id)
@@ -41,7 +41,7 @@ _XftGetFile (const FcChar8 *file, int id)
     XftFtFile	*f;
 
     if (!XftInitFtLibrary ())
-	return 0;
+	return NULL;
 
     for (f = _XftFtFiles; f; f = f->next)
     {
@@ -56,7 +56,7 @@ _XftGetFile (const FcChar8 *file, int id)
     }
     f = malloc (sizeof (XftFtFile) + strlen ((char *) file) + 1);
     if (!f)
-	return 0;
+	return NULL;
     
     XftMemAlloc (XFT_MEM_FILE, sizeof (XftFtFile) + strlen ((char *) file) + 1);
     if (XftDebug () & XFT_DBG_REF)
@@ -72,7 +72,7 @@ _XftGetFile (const FcChar8 *file, int id)
     f->id = id;
     
     f->lock = 0;
-    f->face = 0;
+    f->face = NULL;
     f->xsize = 0;
     f->ysize = 0;
     f->matrix.xx = f->matrix.xy = f->matrix.yx = f->matrix.yy = 0;
@@ -86,13 +86,13 @@ _XftGetFaceFile (FT_Face face)
 
     f = malloc (sizeof (XftFtFile));
     if (!f)
-	return 0;
+	return NULL;
     XftMemAlloc (XFT_MEM_FILE, sizeof(XftFtFile));
-    f->next = 0;
+    f->next = NULL;
     
     f->ref = 1;
-    
-    f->file = 0;
+
+    f->file = NULL;
     f->id = 0;
     f->lock = 0;
     f->face = face;
@@ -139,7 +139,7 @@ _XftUncacheFiles (void)
 		printf ("Discard file %s/%d from cache\n",
 			f->file, f->id);
 	    FT_Done_Face (f->face);
-	    f->face = 0;
+	    f->face = NULL;
 	}
     }
 }
@@ -255,7 +255,7 @@ _XftSetFace (XftFtFile *f, FT_F26Dot6 xsize, FT_F26Dot6 ysize, FT_Matrix *matrix
 		    (double) matrix->xy / 0x10000,
 		    (double) matrix->yx / 0x10000,
 		    (double) matrix->yy / 0x10000);
-	FT_Set_Transform (face, matrix, 0);
+	FT_Set_Transform (face, matrix, NULL);
 	f->matrix = *matrix;
     }
     return True;
@@ -357,7 +357,7 @@ XftLockFace (XftFont *public)
     if (face && !_XftSetFace (fi->file, fi->xsize, fi->ysize, &fi->matrix))
     {
 	_XftUnlockFile (fi->file);
-	face = 0;
+	face = NULL;
     }
     return face;
 }
@@ -402,7 +402,7 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
      */
     switch (FcPatternGetString (pattern, FC_FILE, 0, &filename)) {
     case FcResultNoMatch:
-	filename = 0;
+	filename = NULL;
 	break;
     case FcResultMatch:
 	break;
@@ -717,7 +717,7 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
     
 bail1:
     _XftReleaseFile (fi->file);
-    fi->file = 0;
+    fi->file = NULL;
 bail0:
     return FcFalse;
 }
@@ -735,12 +735,12 @@ XftFontInfoCreate (Display *dpy, _Xconst FcPattern *pattern)
     XftFontInfo	*fi = malloc (sizeof (XftFontInfo));
 
     if (!fi)
-	return 0;
+	return NULL;
     
     if (!XftFontInfoFill (dpy, pattern, fi))
     {
 	free (fi);
-	fi = 0;
+	fi = NULL;
     }
     XftMemAlloc (XFT_MEM_FONT, sizeof (XftFontInfo));
     return fi;
@@ -788,7 +788,7 @@ XftFontOpenInfo (Display	*dpy,
     int			num_glyphs;
 
     if (!info)
-	return 0;
+	return NULL;
     /*
      * Find a matching previously opened font
      */
@@ -831,7 +831,7 @@ XftFontOpenInfo (Display	*dpy,
     if (FcPatternGetCharSet (pattern, FC_CHARSET, 0, &charset) == FcResultMatch)
 	charset = FcCharSetCopy (charset);
     else
-	charset = FcFreeTypeCharSet (face, FcConfigGetBlanks (0));
+	charset = FcFreeTypeCharSet (face, FcConfigGetBlanks (NULL));
     
     antialias = fi->antialias;
     if (!(face->face_flags & FT_FACE_FLAG_SCALABLE))
@@ -865,7 +865,7 @@ XftFontOpenInfo (Display	*dpy,
 	    goto bail2;
     }
     else
-	format = 0;
+	format = NULL;
     
     if (charset)
     {
@@ -1018,7 +1018,7 @@ bail2:
 bail1:
     _XftUnlockFile (fi->file);
 bail0:
-    return 0;
+    return NULL;
 }
 
 _X_EXPORT XftFont *
@@ -1028,7 +1028,7 @@ XftFontOpenPattern (Display *dpy, FcPattern *pattern)
     XftFont	    *font;
 
     if (!XftFontInfoFill (dpy, pattern, &info))
-	return 0;
+	return NULL;
 
     font = XftFontOpenInfo (dpy, pattern, &info);
     XftFontInfoEmpty (dpy, &info);

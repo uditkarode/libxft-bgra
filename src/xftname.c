@@ -31,7 +31,7 @@ static const FcObjectType	_XftObjectTypes[] = {
 
 #define NUM_OBJECT_TYPES    (sizeof _XftObjectTypes / sizeof _XftObjectTypes[0])
 
-_X_HIDDEN FcBool	_XftNameInitialized;
+static FcBool _XftNameInitialized;
 
 _X_HIDDEN void 
 _XftNameInit (void)

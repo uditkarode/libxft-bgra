@@ -1,5 +1,5 @@
 AM_CFLAGS = $(FONTCONFIG_CFLAGS) $(FREETYPE_CFLAGS) $(XRENDER_CFLAGS) \
-            $(WARN_CFLAGS) -I$(top_srcdir)/include/X11/Xft
+            $(CWARNFLAGS) -I$(top_srcdir)/include/X11/Xft
 
 lib_LTLIBRARIES = libXft.la
 

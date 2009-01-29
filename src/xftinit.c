@@ -22,7 +22,7 @@
 
 #include "xftint.h"
 
-_X_HIDDEN Bool	    _XftConfigInitialized;
+static Bool _XftConfigInitialized;
 
 _X_EXPORT Bool
 XftInit (_Xconst char *config)

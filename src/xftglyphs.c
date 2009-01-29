@@ -546,7 +546,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 			memcpy (xftg->bitmap, bufBitmapRgba, sizergba);
 		}
 		else
-		    xftg->bitmap = 0;
+		    xftg->bitmap = NULL;
 	    }
 	}
 	else
@@ -592,7 +592,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 			memcpy (xftg->bitmap, bufBitmap, size);
 		}
 		else
-		    xftg->bitmap = 0;
+		    xftg->bitmap = NULL;
 	    }
 	}
 	font->glyph_memory += xftg->glyph_memory;
@@ -655,7 +655,7 @@ XftFontUnloadGlyphs (Display		*dpy,
 	}
 	free (xftg);
 	XftMemFree (XFT_MEM_GLYPH, sizeof (XftGlyph));
-	font->glyphs[glyphindex] = 0;
+	font->glyphs[glyphindex] = NULL;
     }    
     if (font->glyphset && nused)
 	XRenderFreeGlyphs (dpy, font->glyphset, glyphBuf, nused);
@@ -684,7 +684,7 @@ XftFontCheckGlyph (Display	*dpy,
 	    if (!xftg)
 		return FcFalse;
 	    XftMemAlloc (XFT_MEM_GLYPH, sizeof (XftGlyph));
-	    xftg->bitmap = 0;
+	    xftg->bitmap = NULL;
 	    xftg->glyph_memory = 0;
 	    font->glyphs[glyph] = xftg;
 	}

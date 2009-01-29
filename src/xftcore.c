@@ -997,7 +997,7 @@ XftGlyphCore (XftDraw		*draw,
 	else
 	{
 	    draw->core.use_pixmap--;
-	    image = 0;
+	    image = NULL;
 	}
 	if (!image && (depth = XftDrawDepth (draw)))
 	{
@@ -1153,7 +1153,7 @@ XftGlyphSpecCore (XftDraw		*draw,
 	else
 	{
 	    draw->core.use_pixmap--;
-	    image = 0;
+	    image = NULL;
 	}
 	if (!image && (depth = XftDrawDepth (draw)))
 	{
@@ -1304,7 +1304,7 @@ XftGlyphFontSpecCore (XftDraw			*draw,
 	else
 	{
 	    draw->core.use_pixmap--;
-	    image = 0;
+	    image = NULL;
 	}
 	if (!image && (depth = XftDrawDepth (draw)))
 	{

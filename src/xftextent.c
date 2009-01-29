@@ -53,7 +53,7 @@ XftGlyphExtents (Display	    *dpy,
 	XftFontLoadGlyphs (dpy, pub, FcFalse, missing, nmissing);
     g = glyphs;
     n = nglyphs;
-    xftg = 0;
+    xftg = NULL;
     while (n)
     {
 	glyph = *g++;

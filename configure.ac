@@ -36,11 +36,15 @@ AC_CONFIG_AUX_DIR(.)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
+# Require xorg-macros: XORG_CWARNFLAGS, XORG_CHANGELOG
+m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.2 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.2)
 AM_CONFIG_HEADER(config.h)
 
 # checks for progs
 AC_PROG_CC
 AC_PROG_LIBTOOL
+XORG_CWARNFLAGS
 
 #
 # Check for Xrender
@@ -128,16 +132,8 @@ if test "$VERSION" = "" ; then
        VERSION=$PACKAGE_VERSION;
 fi
 
-WARN_CFLAGS=""
-
-if test "x$GCC" = "xyes"; then
-	WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes \
-	-Wmissing-prototypes -Wmissing-declarations \
-	-Wnested-externs -fno-strict-aliasing"
-fi
-AC_SUBST(WARN_CFLAGS)
-
 XORG_RELEASE_VERSION
+XORG_CHANGELOG
 
 AC_OUTPUT([Makefile
 	   xft.pc
