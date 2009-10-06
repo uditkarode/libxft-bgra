@@ -41,9 +41,7 @@ Support fontconfig 2.2 release which doesn't include FC_HINT_STYLE.
 
 To release a version of this library:
 
- 1.     Update the version numbers
-                configure.ac
-                Xft.h
+ 1.     Update the version number in configure.ac
  2.     Fix the README
                 Change version number
                 Set the date

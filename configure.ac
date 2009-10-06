@@ -25,9 +25,7 @@ AC_PREREQ([2.57])
 
 dnl
 dnl This is the package version number, not the shared library
-dnl version.  This same version number must appear in Xft.h
-dnl Yes, it is a pain to synchronize version numbers.  Unfortunately, it's
-dnl not possible to extract the version number here from Xft.h
+dnl version.  This version number will be substituted into Xft.h
 dnl Please bump the minor library number at each release as well.
 dnl
 AC_INIT(libXft, 2.1.13, [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], libXft)
@@ -45,6 +43,19 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_LIBTOOL
 XORG_DEFAULT_OPTIONS
+
+# Set library version for Xft.h from package version set in AC_INIT
+# copied from PACKAGE_VERSION_* settings in XORG_VERSION
+AC_CONFIG_HEADERS([include/X11/Xft/Xft.h])
+AC_DEFINE_UNQUOTED([XFT_MAJOR],
+                [`echo $PACKAGE_VERSION | cut -d . -f 1`],
+                [Major version of Xft])
+AC_DEFINE_UNQUOTED([XFT_MINOR],
+                [`echo $PACKAGE_VERSION | cut -d . -f 2 | cut -d - -f 1`],
+                [Minor version of Xft])
+AC_DEFINE_UNQUOTED([XFT_REVISION],
+                [`echo $PACKAGE_VERSION | cut -d . -f 3 | cut -d - -f 1`],
+                [Micro revision of Xft])
 
 #
 # Check for Xrender
