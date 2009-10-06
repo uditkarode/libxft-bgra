@@ -1,5 +1,5 @@
 AM_CFLAGS = $(FONTCONFIG_CFLAGS) $(FREETYPE_CFLAGS) $(XRENDER_CFLAGS) \
-            $(CWARNFLAGS) -I$(top_srcdir)/include/X11/Xft
+            $(CWARNFLAGS) -I$(top_builddir)/include/X11/Xft
 
 lib_LTLIBRARIES = libXft.la
 
@@ -28,5 +28,5 @@ libXft_la_LDFLAGS = -version-number 2:1:13 -no-undefined
 
 libXftincludedir = $(includedir)/X11/Xft
 libXftinclude_HEADERS = \
-	$(top_srcdir)/include/X11/Xft/Xft.h		\
+	$(top_builddir)/include/X11/Xft/Xft.h		\
 	$(top_srcdir)/include/X11/Xft/XftCompat.h
