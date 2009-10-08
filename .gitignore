@@ -30,3 +30,4 @@ xft.pc
 libXft-*.tar.*
 ChangeLog
 tags
+include/X11/Xft/Xft.h
