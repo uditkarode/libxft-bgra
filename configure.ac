@@ -28,7 +28,7 @@ dnl This is the package version number, not the shared library
 dnl version.  This version number will be substituted into Xft.h
 dnl Please bump the minor library number at each release as well.
 dnl
-AC_INIT(libXft, 2.1.13, [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], libXft)
+AC_INIT(libXft, 2.1.14, [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], libXft)
 AC_CONFIG_AUX_DIR(.)
 
 AM_INIT_AUTOMAKE([dist-bzip2])
