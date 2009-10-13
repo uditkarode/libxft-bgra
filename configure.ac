@@ -57,6 +57,9 @@ AC_DEFINE_UNQUOTED([XFT_REVISION],
                 [`echo $PACKAGE_VERSION | cut -d . -f 3 | cut -d - -f 1`],
                 [Micro revision of Xft])
 
+XFT_LT_VERSION=`echo $PACKAGE_VERSION | tr '.' ':'`
+AC_SUBST([XFT_LT_VERSION])
+
 #
 # Check for Xrender
 #
