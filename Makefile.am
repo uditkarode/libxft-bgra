@@ -28,6 +28,7 @@ pkgconfig_DATA = xft.pc
 
 CLEANFILES = xft-config
 
+MAINTAINERCLEANFILES = ChangeLog INSTALL
 EXTRA_DIST = xft-config.in xft.pc.in 
 
 .PHONY: ChangeLog INSTALL
