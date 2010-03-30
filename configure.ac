@@ -149,8 +149,6 @@ fi
 
 AC_OUTPUT([Makefile
 	   xft.pc
-	   xft-config
 	   src/Makefile
 	   man/Makefile
-	   man/xft-config.1
 	   man/Xft.3])

@@ -21,12 +21,8 @@
 
 SUBDIRS = man src
 
-bin_SCRIPTS = xft-config
-
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = xft.pc
-
-CLEANFILES = xft-config
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 
