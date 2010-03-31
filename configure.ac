@@ -44,6 +44,7 @@ AM_CONFIG_HEADER(config.h)
 # checks for progs
 AC_PROG_CC
 AC_PROG_LIBTOOL
+AC_PROG_SED
 
 # Set library version for Xft.h from package version set in AC_INIT
 # copied from PACKAGE_VERSION_* settings in XORG_VERSION
@@ -150,5 +151,4 @@ fi
 AC_OUTPUT([Makefile
 	   xft.pc
 	   src/Makefile
-	   man/Makefile
-	   man/Xft.3])
+	   man/Makefile])
