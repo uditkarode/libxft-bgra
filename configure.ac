@@ -30,7 +30,6 @@ dnl Please bump the minor library number at each release as well.
 dnl
 AC_INIT([libXft], [2.2.0],
         [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [libXft])
-AC_CONFIG_AUX_DIR(.)
 
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
