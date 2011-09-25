@@ -64,7 +64,7 @@ AC_SUBST([XFT_LT_VERSION])
 #
 # Check for Xrender
 #
-PKG_CHECK_MODULES(XRENDER, xrender >= 0.8.2 xext x11)
+PKG_CHECK_MODULES(XRENDER, xrender >= 0.8.2 x11)
 
 # Check freetype configuration
 AC_ARG_WITH(freetype-config, [  --with-freetype-config=PROG   Use FreeType configuration program PROG], freetype_config=$withval, freetype_config=auto)
