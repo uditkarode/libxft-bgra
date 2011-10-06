@@ -369,6 +369,10 @@ _XftDefaultInit (Display *dpy)
 	goto bail1;
     if (!_XftDefaultInitInteger (dpy, pat, FC_RGBA))
 	goto bail1;
+#ifdef FC_LCD_FILTER
+    if (!_XftDefaultInitInteger (dpy, pat, FC_LCD_FILTER))
+	goto bail1;
+#endif
     if (!_XftDefaultInitBool (dpy, pat, FC_ANTIALIAS))
 	goto bail1;
 #ifdef FC_EMBOLDEN
@@ -521,6 +525,14 @@ XftDefaultSubstitute (Display *dpy, int screen, FcPattern *pattern)
 			      XftDefaultGetInteger (dpy, FC_RGBA, screen,
 						    subpixel));
     }
+#ifdef FC_LCD_FILTER
+    if (FcPatternGet (pattern, FC_LCD_FILTER, 0, &v) == FcResultNoMatch)
+    {
+	FcPatternAddInteger (pattern, FC_LCD_FILTER,
+			     XftDefaultGetInteger (dpy, FC_LCD_FILTER, screen,
+						   FC_LCD_DEFAULT));
+    }
+#endif
     if (FcPatternGet (pattern, FC_MINSPACE, 0, &v) == FcResultNoMatch)
     {
 	FcPatternAddBool (pattern, FC_MINSPACE,
