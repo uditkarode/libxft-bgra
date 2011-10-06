@@ -358,7 +358,7 @@ XftFontLoadGlyphs (Display	    *dpy,
     unsigned char   bufLocal[4096];
     unsigned char   *bufBitmap = bufLocal;
     int		    bufSize = sizeof (bufLocal);
-    int		    size, pitch;
+    int		    size;
     int		    width;
     int		    height;
     int		    left, right, top, bottom;
@@ -572,7 +572,6 @@ XftFontLoadGlyphs (Display	    *dpy,
 
 	width = ftbit->width;
 	height = ftbit->rows;
-	pitch = (width+3) & ~3;
 
 	if (XftDebug() & XFT_DBG_GLYPH)
 	{
@@ -674,12 +673,9 @@ XftFontLoadGlyphs (Display	    *dpy,
 		/* swap bits in each byte */
 		if (BitmapBitOrder (dpy) != MSBFirst)
 		{
-		    unsigned char   *line;
-		    unsigned char   c;
-		    int		    i;
+		    unsigned char   *line = (unsigned char*)bufBitmap;
+		    int		    i = size;
 
-		    line = (unsigned char *) bufBitmap;
-		    i = size;
 		    while (i--)
 		    {
 			int c = *line;
