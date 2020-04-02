@@ -86,7 +86,7 @@ _compute_xrender_bitmap_size( FT_Bitmap*	target,
     if ( slot->format != FT_GLYPH_FORMAT_BITMAP )
 	return -1;
 
-    // compute the size of the final bitmap
+    /* compute the size of the final bitmap */
     ftbit = &slot->bitmap;
 
     width = (int)ftbit->width;
@@ -566,7 +566,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    xftg->metrics.yOff = (short)(-TRUNC(ROUND(glyphslot->advance.y)));
 	}
 
-	// compute the size of the final bitmap
+	/* compute the size of the final bitmap */
 	ftbit = &glyphslot->bitmap;
 
 	width = (int)ftbit->width;
