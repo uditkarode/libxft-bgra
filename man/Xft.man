@@ -288,7 +288,7 @@ The X
 .BR Drawable ,
 .BR Colormap ,
 and
-.BR Visual
+.B Visual
 of an
 .B XftDraw
 can be queried with
