@@ -499,6 +499,15 @@ XftFontInfoFill (Display *dpy, _Xconst FcPattern *pattern, XftFontInfo *fi)
     if (info->hasRender)
     {
 	switch (FcPatternGetBool (pattern, XFT_RENDER, 0, &fi->render)) {
+	case FcResultTypeMismatch:
+	    /*
+	     * Fontconfig no longer supports xft's custom values in
+	     * text patterns, so any name specifying render:true or
+	     * render:false will have an invalid type in the resulting
+	     * pattern. Just ignore that case so that the app doesn't
+	     * just fail
+	     */
+	    /* fall through ... */
 	case FcResultNoMatch:
 	    fi->render = info->hasRender;
 	    break;
