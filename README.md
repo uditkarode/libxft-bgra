@@ -1,4 +1,17 @@
-libXft - X FreeType library
+Installation Instructions for Patched libXft
+--------------------------------------------
+If you're an Arch linux user, you can just install `libxft-bgra-git`   
+from the AUR. If you use any other distro (void in my case), follow
+the instructions below (first install libXft from your distro's    
+repositories):   
+```bash
+git clone https://github.com/uditkarode/libxft-bgra
+cd libxft-bgra
+sh autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
+sudo make install
+```
+
+libXft - X FreeType library (rest of the readme stuff)
 ---------------------------
 
 libXft is the client side font rendering library, using libfreetype,
