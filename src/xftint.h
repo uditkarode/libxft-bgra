@@ -85,6 +85,7 @@ typedef struct _XftGlyph {
     XGlyphInfo	    metrics;
     void	    *bitmap;
     unsigned long   glyph_memory;
+    Picture         picture;
 } XftGlyph;
 
 /*
@@ -134,6 +135,7 @@ struct _XftFontInfo {
     FT_F26Dot6		xsize, ysize;	/* pixel size */
     FcBool		antialias;	/* doing antialiasing */
     FcBool		embolden;	/* force emboldening */
+    FcBool		color;		/* contains color glyphs */
     int			rgba;		/* subpixel order */
     int			lcd_filter;	/* lcd filter */
     FT_Matrix		matrix;		/* glyph transformation matrix */

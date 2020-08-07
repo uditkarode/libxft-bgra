@@ -26,6 +26,8 @@
 
 #include FT_SYNTHESIS_H
 
+#include FT_GLYPH_H
+
 /*
  * Validate the memory info for a font
  */
@@ -78,9 +80,11 @@ _XftFontValidateMemory (Display *dpy, XftFont *public)
 static int
 _compute_xrender_bitmap_size( FT_Bitmap*	target,
 			      FT_GlyphSlot	slot,
-			      FT_Render_Mode	mode )
+			      FT_Render_Mode	mode,
+			      FT_Matrix*        matrix )
 {
     FT_Bitmap*	ftbit;
+    FT_Vector	vector;
     int		width, height, pitch;
 
     if ( slot->format != FT_GLYPH_FORMAT_BITMAP )
@@ -91,6 +95,16 @@ _compute_xrender_bitmap_size( FT_Bitmap*	target,
 
     width = (int)ftbit->width;
     height = (int)ftbit->rows;
+
+    if ( matrix && mode == FT_RENDER_MODE_NORMAL )
+    {
+	vector.x = ftbit->width;
+	vector.y = ftbit->rows;
+	FT_Vector_Transform(&vector, matrix);
+
+	width = (int)vector.x;
+	height = (int)vector.y;
+    }
     pitch = (width+3) & ~3;
 
     switch ( ftbit->pixel_mode )
@@ -110,6 +124,10 @@ _compute_xrender_bitmap_size( FT_Bitmap*	target,
 	    /* each pixel is replicated into a 32-bit ARGB value */
 	    pitch = width*4;
 	}
+	break;
+
+    case FT_PIXEL_MODE_BGRA:
+	pitch = width * 4;
 	break;
 
     case FT_PIXEL_MODE_LCD:
@@ -140,6 +158,105 @@ _compute_xrender_bitmap_size( FT_Bitmap*	target,
     target->buffer = NULL;
 
     return pitch * height;
+}
+
+/* this functions converts the glyph bitmap found in a FT_GlyphSlot
+ * into a different format while scaling by applying the given matrix
+ * (see _compute_xrender_bitmap_size)
+ *
+ * you should call this function after _compute_xrender_bitmap_size
+ *
+ * target :: target bitmap descriptor. Note that its 'buffer' pointer
+ *           must point to memory allocated by the caller
+ *
+ * source :: the source bitmap descriptor
+ *
+ * matrix :: the scaling matrix to apply
+ */
+static void
+_scaled_fill_xrender_bitmap( FT_Bitmap*	target,
+		             FT_Bitmap* source,
+                             const FT_Matrix* matrix )
+{
+    unsigned char*	src_buf	  = source->buffer;
+    unsigned char*	dst_line  = target->buffer;
+    int			src_pitch = source->pitch;
+    int			width     = target->width;
+    int			height    = target->rows;
+    int			pitch     = target->pitch;
+    int			h;
+    FT_Vector		vector;
+    FT_Matrix		inverse	  = *matrix;
+    int			sampling_width;
+    int			sampling_height;
+    int			sample_count;
+
+    if ( src_pitch < 0 )
+	src_buf -= src_pitch*(source->rows-1);
+
+    FT_Matrix_Invert(&inverse);
+
+    /* compute how many source pixels a target pixel spans */
+    vector.x = 1;
+    vector.y = 1;
+    FT_Vector_Transform(&vector, &inverse);
+    sampling_width = vector.x / 2;
+    sampling_height = vector.y / 2;
+    sample_count = (2 * sampling_width + 1) * (2 * sampling_height + 1);
+
+    for	( h = height; h	> 0; h--, dst_line += pitch )
+    {
+	int x;
+
+	for ( x	= 0; x < width;	x++ )
+	{
+	    unsigned char* src;
+
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+
+            /* compute target pixel location in source space */
+	    vector.x = (x            * 0x10000) + 0x10000 / 2;
+	    vector.y = ((height - h) * 0x10000) + 0x10000 / 2;
+	    FT_Vector_Transform(&vector, &inverse);
+	    vector.x = CLAMP(FT_RoundFix(vector.x) / 0x10000, 0, source->width - 1);
+	    vector.y = CLAMP(FT_RoundFix(vector.y) / 0x10000, 0, source->rows  - 1);
+
+	    switch ( source->pixel_mode	)
+	    {
+	    case FT_PIXEL_MODE_MONO: /* convert mono to 8-bit gray, scale using nearest pixel */
+		src = src_buf + (vector.y * src_pitch);
+		if ( src[(vector.x >> 3)] & (0x80 >> (vector.x & 7)) )
+		    dst_line[x] = 0xff;
+		break;
+
+	    case FT_PIXEL_MODE_GRAY: /* scale using nearest pixel */
+		src = src_buf + (vector.y * src_pitch);
+		dst_line[x] = src[vector.x];
+		break;
+
+	    case FT_PIXEL_MODE_BGRA: /* scale by averaging all relevant source pixels, keep BGRA format */
+	    {
+		int sample_x, sample_y;
+		int bgra[4] = {};
+		for (sample_y = - sampling_height; sample_y < sampling_height + 1; ++sample_y)
+		{
+		    int src_y = CLAMP(vector.y + sample_y, 0, source->rows - 1);
+		    src = src_buf + (src_y * src_pitch);
+		    for (sample_x = - sampling_width; sample_x < sampling_width + 1; ++sample_x)
+		    {
+			int src_x = CLAMP(vector.x + sample_x, 0, source->width - 1);
+			for (int i = 0; i < 4; ++i)
+			    bgra[i] += src[src_x * 4 + i];
+		    }
+		}
+
+		for (int i = 0; i < 4; ++i)
+		    dst_line[4 * x + i] = bgra[i] / sample_count;
+		break;
+	    }
+	    }
+	}
+    }
 }
 
 /* this functions converts the glyph bitmap found in a FT_GlyphSlot
@@ -242,6 +359,11 @@ _fill_xrender_bitmap( FT_Bitmap*	target,
 		for ( h = height; h > 0; h--, srcLine += src_pitch, dstLine += pitch )
 		    memcpy( dstLine, srcLine, (size_t)width );
 	    }
+	    break;
+
+	case FT_PIXEL_MODE_BGRA: /* Preserve BGRA format */
+	    for ( h = height; h > 0; h--, srcLine += src_pitch, dstLine += pitch )
+		memcpy( dstLine, srcLine, width * 4 );
 	    break;
 
 	case FT_PIXEL_MODE_LCD:
@@ -365,6 +487,8 @@ XftFontLoadGlyphs (Display	    *dpy,
     FT_Vector	    vector;
     FT_Face	    face;
     FT_Render_Mode  mode = FT_RENDER_MODE_MONO;
+    FcBool	    transform;
+    FcBool	    glyph_transform;
 
     if (!info)
 	return;
@@ -374,6 +498,8 @@ XftFontLoadGlyphs (Display	    *dpy,
     if (!face)
 	return;
 
+    if (font->info.color)
+        mode = FT_RENDER_MODE_NORMAL;
     if (font->info.antialias)
     {
 	switch (font->info.rgba) {
@@ -389,6 +515,8 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    mode = FT_RENDER_MODE_NORMAL;
 	}
     }
+
+    transform = font->info.transform && mode != FT_RENDER_MODE_MONO;
 
     while (nglyph--)
     {
@@ -440,7 +568,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 	/*
 	 * Compute glyph metrics from FreeType information
 	 */
-	if(font->info.transform && glyphslot->format != FT_GLYPH_FORMAT_BITMAP)
+	if (transform)
 	{
 	    /*
 	     * calculate the true width by transforming all four corners.
@@ -487,7 +615,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 	 * Clip charcell glyphs to the bounding box
 	 * XXX transformed?
 	 */
-	if (font->info.spacing >= FC_CHARCELL && !font->info.transform)
+	if (font->info.spacing >= FC_CHARCELL && !transform)
 	{
 	    if (font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT)
 	    {
@@ -519,18 +647,20 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    }
 	}
 
+	glyph_transform = transform;
 	if ( glyphslot->format != FT_GLYPH_FORMAT_BITMAP )
 	{
 	    error = FT_Render_Glyph( face->glyph, mode );
 	    if (error)
 		continue;
+	    glyph_transform = False;
 	}
 
 	FT_Library_SetLcdFilter( _XftFTlibrary, FT_LCD_FILTER_NONE );
 
 	if (font->info.spacing >= FC_MONO)
 	{
-	    if (font->info.transform)
+	    if (transform)
 	    {
 		if (font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT)
 		{
@@ -613,14 +743,27 @@ XftFontLoadGlyphs (Display	    *dpy,
 	    }
 	}
 
-	size = _compute_xrender_bitmap_size( &local, glyphslot, mode );
+	size = _compute_xrender_bitmap_size( &local, glyphslot, mode, glyph_transform ? &font->info.matrix : NULL );
 	if ( size < 0 )
 	    continue;
 
 	xftg->metrics.width  = (unsigned short)local.width;
 	xftg->metrics.height = (unsigned short)local.rows;
-	xftg->metrics.x      = (short)(- glyphslot->bitmap_left);
-	xftg->metrics.y      = (short)(  glyphslot->bitmap_top);
+	if (transform)
+	{
+	    vector.x = - glyphslot->bitmap_left;
+	    vector.y =   glyphslot->bitmap_top;
+
+	    FT_Vector_Transform(&vector, &font->info.matrix);
+
+	    xftg->metrics.x = (short)vector.x;
+	    xftg->metrics.y = (short)vector.y;
+	}
+	else
+	{
+	    xftg->metrics.x = (short)(- glyphslot->bitmap_left);
+	    xftg->metrics.y = (short)(  glyphslot->bitmap_top);
+	}
 
 	/*
 	 * If the glyph is relatively large (> 1% of server memory),
@@ -645,9 +788,12 @@ XftFontLoadGlyphs (Display	    *dpy,
 
 	local.buffer = bufBitmap;
 
-	_fill_xrender_bitmap( &local, glyphslot, mode,
-			      (font->info.rgba == FC_RGBA_BGR ||
-			       font->info.rgba == FC_RGBA_VBGR ) );
+        if (mode == FT_RENDER_MODE_NORMAL && glyph_transform)
+            _scaled_fill_xrender_bitmap(&local, &glyphslot->bitmap, &font->info.matrix);
+        else
+	    _fill_xrender_bitmap( &local, glyphslot, mode,
+			          (font->info.rgba == FC_RGBA_BGR ||
+			           font->info.rgba == FC_RGBA_VBGR ) );
 
 	/*
 	 * Copy or convert into local buffer.
@@ -662,6 +808,7 @@ XftFontLoadGlyphs (Display	    *dpy,
 	 */
 	glyph = (Glyph) glyphindex;
 
+	xftg->picture = 0;
 	xftg->glyph_memory = (size_t)size + sizeof (XftGlyph);
 	if (font->format)
 	{
@@ -685,15 +832,35 @@ XftFontLoadGlyphs (Display	    *dpy,
 		    }
 		}
 	    }
-	    else if ( mode != FT_RENDER_MODE_NORMAL )
+	    else if (glyphslot->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA || mode != FT_RENDER_MODE_NORMAL)
 	    {
 		/* invert ARGB <=> BGRA */
 		if (ImageByteOrder (dpy) != XftNativeByteOrder ())
 		    XftSwapCARD32 ((CARD32 *) bufBitmap, size >> 2);
 	    }
-	    XRenderAddGlyphs (dpy, font->glyphset, &glyph,
-			      &xftg->metrics, 1,
-			      (char *) bufBitmap, size);
+
+	    if (glyphslot->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA)
+	    {
+		Pixmap pixmap = XCreatePixmap(dpy, DefaultRootWindow(dpy), local.width, local.rows, 32);
+		GC gc = XCreateGC(dpy, pixmap, 0, NULL);
+		XImage image = {
+		    local.width, local.rows, 0, ZPixmap, (char *)bufBitmap,
+		    dpy->byte_order, dpy->bitmap_unit, dpy->bitmap_bit_order, 32,
+		    32, local.width * 4 - local.pitch, 32,
+		    0, 0, 0
+		};
+
+		XInitImage(&image);
+		XPutImage(dpy, pixmap, gc, &image, 0, 0, 0, 0, local.width, local.rows);
+		xftg->picture = XRenderCreatePicture(dpy, pixmap, font->format, 0, NULL);
+
+		XFreeGC(dpy, gc);
+		XFreePixmap(dpy, pixmap);
+	    }
+	    else
+		XRenderAddGlyphs (dpy, font->glyphset, &glyph,
+				  &xftg->metrics, 1,
+				  (char *) bufBitmap, size);
 	}
 	else
 	{
@@ -744,7 +911,9 @@ XftFontUnloadGlyphs (Display		*dpy,
 	{
 	    if (font->format)
 	    {
-		if (font->glyphset)
+		if (xftg->picture)
+		    XRenderFreePicture(dpy, xftg->picture);
+		else if (font->glyphset)
 		{
 		    glyphBuf[nused++] = (Glyph) glyphindex;
 		    if (nused == sizeof (glyphBuf) / sizeof (glyphBuf[0]))
