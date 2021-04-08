@@ -11,6 +11,13 @@ sh autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
 sudo make install
 ```
 
+### Additional Dependancies ###
+
+***Ubuntu/Debian***
+* dh-autoreconf 
+* autotools-dev 
+* xutils-dev 
+
 libXft - X FreeType library (rest of the readme stuff)
 ---------------------------
 
