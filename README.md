@@ -1,9 +1,27 @@
+Pre Requisite:
+---------------
+make sure to have following libs in the respective distros
+
+Void:
+```bash
+1.autoconf
+2.automake
+3.xorg-util-macros
+4.libtool
+5.make
+6.gcc
+7.libXft and devel pkg
+8.gettext
+9.base-devel
+```
+Debian:
+Arch:
+
 Installation Instructions for Patched libXft
 --------------------------------------------
 If you're an Arch linux user, you can just install `libxft-bgra-git`   
-from the AUR. If you use any other distro (void in my case), follow
-the instructions below (first install libXft from your distro's    
-repositories):   
+from the AUR.  
+
 ```bash
 git clone https://github.com/uditkarode/libxft-bgra
 cd libxft-bgra
